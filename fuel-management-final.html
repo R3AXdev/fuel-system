@@ -1,0 +1,3467 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>نظام إدارة المحروقات</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ===================== VARIABLES ===================== */
+:root {
+  --primary:#1a2744; --primary-light:#243460; --primary-xlight:#2d4080;
+  --accent:#e67e22; --accent-dark:#d35400;
+  --success:#27ae60; --danger:#e74c3c; --warning:#f39c12; --info:#2980b9;
+  --purple:#8e44ad;
+  --bg:#f0f2f7; --card:#fff; --text:#2c3e50; --text-light:#7f8c8d;
+  --border:#dde3ec; --border-light:#eef1f7;
+  --sidebar-w:265px; --header-h:64px;
+  --radius:10px; --radius-sm:6px;
+  --shadow:0 2px 12px rgba(0,0,0,.08);
+  --shadow-md:0 4px 20px rgba(0,0,0,.13);
+}
+/* ===================== RESET ===================== */
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);direction:rtl;font-size:14px;line-height:1.5}
+a{text-decoration:none}
+button{font-family:'Cairo',sans-serif}
+/* ===================== SCROLLBAR ===================== */
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:#f0f2f7}
+::-webkit-scrollbar-thumb{background:#c0c8d8;border-radius:4px}
+
+/* ===================== LOGIN ===================== */
+#loginPage{min-height:100vh;display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(135deg,#0f1d3a 0%,#1a2744 45%,#243460 100%)}
+#loginPage::before{content:'';position:absolute;inset:0;
+  background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")}
+.login-box{background:#fff;border-radius:18px;padding:48px 44px;width:100%;max-width:420px;
+  box-shadow:0 25px 70px rgba(0,0,0,.4);text-align:center;position:relative;z-index:1}
+.login-logo{font-size:56px;margin-bottom:6px;display:block}
+.login-box h1{font-size:22px;font-weight:700;color:var(--primary);margin-bottom:4px}
+.login-box .login-sub{color:var(--text-light);font-size:13px;margin-bottom:30px}
+#loginError{background:#fde8e8;color:var(--danger);padding:10px 14px;border-radius:8px;
+  margin-bottom:16px;font-size:13px;display:none;border-right:3px solid var(--danger)}
+
+/* ===================== FORMS ===================== */
+.form-group{margin-bottom:16px;text-align:right}
+.form-group label{display:block;font-weight:600;margin-bottom:5px;color:var(--text);font-size:13px}
+.form-group label .req{color:var(--danger)}
+.form-control{width:100%;padding:10px 13px;border:1.5px solid var(--border);border-radius:8px;
+  font-family:'Cairo',sans-serif;font-size:14px;color:var(--text);background:#fafbfd;
+  transition:border-color .2s,box-shadow .2s;direction:rtl}
+.form-control:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(230,126,34,.12);background:#fff}
+textarea.form-control{resize:vertical;min-height:80px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.form-row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+.form-hint{font-size:12px;color:var(--text-light);margin-top:4px}
+.form-divider{border:none;border-top:1px solid var(--border);margin:18px 0}
+.form-section-title{font-size:13px;font-weight:700;color:var(--primary);margin-bottom:12px;
+  padding-bottom:6px;border-bottom:2px solid var(--accent);display:inline-block}
+
+/* ===================== BUTTONS ===================== */
+.btn{padding:9px 18px;border:none;border-radius:8px;font-family:'Cairo',sans-serif;font-size:13.5px;
+  font-weight:600;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+.btn:active{transform:scale(.97)}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{background:var(--accent-dark);box-shadow:0 4px 12px rgba(230,126,34,.3)}
+.btn-secondary{background:#f0f2f7;color:var(--text)}
+.btn-secondary:hover{background:#e2e6ef}
+.btn-success{background:var(--success);color:#fff}
+.btn-success:hover{background:#219a52}
+.btn-danger{background:var(--danger);color:#fff}
+.btn-danger:hover{background:#c0392b}
+.btn-info{background:var(--info);color:#fff}
+.btn-info:hover{background:#1a6fa3}
+.btn-warning{background:var(--warning);color:#fff}
+.btn-warning:hover{background:#d68910}
+.btn-purple{background:var(--purple);color:#fff}
+.btn-purple:hover{background:#7d3c98}
+.btn-dark{background:var(--primary);color:#fff}
+.btn-dark:hover{background:var(--primary-light)}
+.btn-sm{padding:5px 11px;font-size:12px;border-radius:6px}
+.btn-full{width:100%;justify-content:center;padding:11px}
+.btn-icon{padding:6px 10px}
+
+/* ===================== SIDEBAR ===================== */
+#app{display:flex;min-height:100vh}
+.sidebar{position:fixed;top:0;right:0;width:var(--sidebar-w);height:100vh;
+  background:var(--primary);display:flex;flex-direction:column;z-index:200;
+  transition:transform .3s;overflow:hidden}
+.sidebar-brand{padding:20px 16px 16px;border-bottom:1px solid rgba(255,255,255,.08);
+  display:flex;align-items:center;gap:11px;flex-shrink:0}
+.brand-icon{width:42px;height:42px;background:var(--accent);border-radius:10px;
+  display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.brand-text h2{color:#fff;font-size:14px;font-weight:700;line-height:1.2}
+.brand-text small{color:rgba(255,255,255,.45);font-size:11px}
+.sidebar-nav{flex:1;padding:12px 10px;overflow-y:auto}
+.nav-section{margin-bottom:4px}
+.nav-section-label{font-size:10px;font-weight:700;color:rgba(255,255,255,.3);
+  letter-spacing:1px;padding:6px 10px 2px;text-transform:uppercase}
+.nav-btn{display:flex;align-items:center;gap:9px;padding:9px 12px;border-radius:7px;
+  color:rgba(255,255,255,.65);text-decoration:none;font-weight:500;font-size:13.5px;
+  margin-bottom:2px;transition:all .18s;cursor:pointer;border:none;background:none;
+  width:100%;text-align:right}
+.nav-btn:hover{background:rgba(255,255,255,.08);color:#fff}
+.nav-btn.active{background:var(--accent);color:#fff;box-shadow:0 3px 10px rgba(230,126,34,.35)}
+.nav-btn .ni{font-size:16px;width:22px;text-align:center;flex-shrink:0}
+.nav-badge{margin-right:auto;background:var(--danger);color:#fff;border-radius:20px;
+  font-size:11px;font-weight:700;padding:1px 7px;min-width:20px;text-align:center}
+.sidebar-footer{padding:12px;border-top:1px solid rgba(255,255,255,.08);flex-shrink:0}
+.user-card{background:rgba(255,255,255,.07);border-radius:8px;padding:10px 12px;margin-bottom:8px}
+.user-card .un{color:#fff;font-weight:700;font-size:13.5px}
+.user-card .ur{margin-top:2px;display:flex;align-items:center;gap:6px}
+.role-chip{display:inline-block;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:700}
+.role-owner{background:rgba(230,126,34,.25);color:#f39c12}
+.role-admin{background:rgba(41,128,185,.25);color:#74b9ff}
+.role-user{background:rgba(39,174,96,.2);color:#55efc4}
+.btn-logout{width:100%;background:rgba(231,76,60,.15);color:#ff7675;border:none;
+  border-radius:7px;padding:8px;font-family:'Cairo',sans-serif;font-size:13px;font-weight:600;
+  cursor:pointer;transition:all .2s}
+.btn-logout:hover{background:rgba(231,76,60,.3)}
+
+/* ===================== MAIN ===================== */
+.main-content{margin-right:var(--sidebar-w);flex:1;display:flex;flex-direction:column;min-height:100vh}
+.top-bar{height:var(--header-h);background:#fff;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;padding:0 24px;
+  position:sticky;top:0;z-index:100;box-shadow:0 1px 4px rgba(0,0,0,.05)}
+.top-bar h1{font-size:18px;font-weight:700;color:var(--primary)}
+.top-bar-left{display:flex;align-items:center;gap:10px}
+.top-bar-right{display:flex;align-items:center;gap:8px}
+.page-body{padding:24px;flex:1}
+.mobile-menu-btn{display:none;background:none;border:none;font-size:22px;cursor:pointer;color:var(--primary);padding:4px}
+#sidebarOverlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:199}
+
+/* ===================== CARDS ===================== */
+.card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;margin-bottom:22px}
+.card-header{padding:14px 18px;border-bottom:1px solid var(--border-light);
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.card-title{font-size:14.5px;font-weight:700;color:var(--primary)}
+.card-body{padding:18px}
+
+/* ===================== STAT CARDS ===================== */
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(175px,1fr));gap:16px;margin-bottom:22px}
+.stat-card{background:var(--card);border-radius:var(--radius);padding:20px 18px;
+  box-shadow:var(--shadow);display:flex;align-items:center;gap:14px;
+  border-right:4px solid transparent;transition:transform .2s,box-shadow .2s;cursor:default}
+.stat-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-md)}
+.stat-card.c-blue{border-right-color:var(--info)}
+.stat-card.c-orange{border-right-color:var(--accent)}
+.stat-card.c-green{border-right-color:var(--success)}
+.stat-card.c-purple{border-right-color:var(--purple)}
+.stat-card.c-red{border-right-color:var(--danger)}
+.stat-card.c-teal{border-right-color:#00b894}
+.stat-icon{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.c-blue .stat-icon{background:#ebf5fb}.c-orange .stat-icon{background:#fef3e7}
+.c-green .stat-icon{background:#eafaf1}.c-purple .stat-icon{background:#f5eef8}
+.c-red .stat-icon{background:#fdedec}.c-teal .stat-icon{background:#e0fdf4}
+.stat-val{font-size:26px;font-weight:700;color:var(--primary);line-height:1}
+.stat-lbl{font-size:11.5px;color:var(--text-light);margin-top:3px}
+
+/* ===================== TABLES ===================== */
+.tbl-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+thead tr{background:#f8fafc}
+th{padding:10px 13px;text-align:right;font-weight:700;color:var(--text-light);font-size:11.5px;
+  text-transform:uppercase;letter-spacing:.3px;border-bottom:1px solid var(--border);white-space:nowrap}
+td{padding:11px 13px;border-bottom:1px solid var(--border-light);color:var(--text);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tbody tr:hover td{background:#fafbfd}
+.tbl-actions{display:flex;gap:5px;align-items:center;flex-wrap:wrap}
+.tbl-empty{text-align:center;padding:50px 20px;color:var(--text-light)}
+.tbl-empty .ei{font-size:44px;margin-bottom:10px}
+
+/* ===================== BADGES ===================== */
+.badge{display:inline-block;padding:3px 9px;border-radius:20px;font-size:11.5px;font-weight:600}
+.b-success{background:#eafaf1;color:var(--success)}
+.b-warning{background:#fef9e7;color:#b7770d}
+.b-danger{background:#fdedec;color:var(--danger)}
+.b-info{background:#ebf5fb;color:var(--info)}
+.b-secondary{background:#f0f2f7;color:var(--text-light)}
+.b-purple{background:#f5eef8;color:var(--purple)}
+
+/* ===================== FILTER BAR ===================== */
+.filter-bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.f-input{padding:7px 12px;border:1.5px solid var(--border);border-radius:7px;
+  font-family:'Cairo',sans-serif;font-size:13px;color:var(--text);background:#fafbfd;
+  transition:border-color .2s;direction:rtl}
+.f-input:focus{outline:none;border-color:var(--accent)}
+.f-input[type=search]{width:200px}
+.f-select{padding:7px 11px;border:1.5px solid var(--border);border-radius:7px;
+  font-family:'Cairo',sans-serif;font-size:13px;color:var(--text);background:#fafbfd;
+  cursor:pointer;direction:rtl}
+.f-select:focus{outline:none;border-color:var(--accent)}
+
+/* ===================== MODAL ===================== */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.52);z-index:1000;
+  display:flex;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(3px)}
+.modal-box{background:#fff;border-radius:14px;width:100%;max-width:520px;max-height:92vh;
+  display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,.28);animation:mIn .22s ease}
+.modal-box.wide{max-width:720px}
+.modal-box.full{max-width:95vw}
+@keyframes mIn{from{opacity:0;transform:translateY(-18px) scale(.97)}to{opacity:1;transform:none}}
+.modal-head{padding:16px 20px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.modal-head h3{font-size:15.5px;font-weight:700;color:var(--primary)}
+.modal-close{background:#f0f2f7;border:none;width:28px;height:28px;border-radius:6px;
+  font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  color:var(--text-light);transition:all .2s;line-height:1}
+.modal-close:hover{background:#fde8e8;color:var(--danger)}
+.modal-body{padding:20px;overflow-y:auto;flex:1}
+.modal-foot{padding:12px 20px;border-top:1px solid var(--border);
+  display:flex;gap:8px;justify-content:flex-end;flex-shrink:0}
+
+/* ===================== CONFIRM ===================== */
+.confirm-overlay{position:fixed;inset:0;background:rgba(0,0,0,.52);z-index:1100;
+  display:flex;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(3px)}
+.confirm-box{background:#fff;border-radius:14px;padding:28px;width:100%;max-width:360px;
+  text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.28);animation:mIn .2s ease}
+.confirm-icon{font-size:46px;margin-bottom:10px}
+.confirm-box h3{font-size:17px;font-weight:700;color:var(--primary);margin-bottom:6px}
+.confirm-box p{font-size:13px;color:var(--text-light);margin-bottom:20px}
+.confirm-actions{display:flex;gap:10px;justify-content:center}
+
+/* ===================== TOAST ===================== */
+#toastBox{position:fixed;bottom:22px;left:22px;z-index:2000;display:flex;flex-direction:column;gap:8px}
+.toast{padding:11px 18px;border-radius:10px;font-size:13.5px;font-weight:600;color:#fff;
+  min-width:200px;box-shadow:0 4px 16px rgba(0,0,0,.22);animation:tIn .28s ease;
+  display:flex;align-items:center;gap:8px}
+@keyframes tIn{from{opacity:0;transform:translateX(-18px)}to{opacity:1;transform:none}}
+.t-success{background:var(--success)}.t-error{background:var(--danger)}.t-info{background:var(--info)}.t-warning{background:var(--warning)}
+
+/* ===================== PERMISSIONS UI ===================== */
+.perm-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:4px}
+.perm-section{border:1px solid var(--border);border-radius:8px;overflow:hidden}
+.perm-sec-head{background:#f8fafc;padding:9px 13px;display:flex;align-items:center;gap:8px;
+  border-bottom:1px solid var(--border)}
+.perm-sec-head strong{font-size:13px;flex:1}
+.perm-sec-head .perm-toggle{font-size:11px;color:var(--info);cursor:pointer;border:none;
+  background:none;font-family:'Cairo',sans-serif;font-weight:600;padding:0}
+.perm-sec-head .perm-toggle:hover{text-decoration:underline}
+.perm-checks{padding:10px 13px;display:flex;flex-direction:column;gap:7px}
+.perm-cb{display:flex;align-items:center;gap:7px;cursor:pointer;font-size:13px}
+.perm-cb input[type=checkbox]{width:15px;height:15px;accent-color:var(--accent);cursor:pointer;flex-shrink:0}
+
+/* ===================== ALERTS ===================== */
+.alert-list{display:flex;flex-direction:column;gap:8px}
+.alert-item{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:8px;
+  border-right:3px solid transparent}
+.alert-item.al-warn{background:#fef9e7;border-right-color:var(--warning)}
+.alert-item.al-danger{background:#fdedec;border-right-color:var(--danger)}
+.alert-item.al-info{background:#ebf5fb;border-right-color:var(--info)}
+.alert-item .al-icon{font-size:22px;flex-shrink:0}
+.alert-item .al-text strong{display:block;font-size:13px;color:var(--text)}
+.alert-item .al-text span{font-size:12px;color:var(--text-light)}
+
+/* ===================== TANK BAR ===================== */
+.tank-card{background:var(--card);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow)}
+.tank-name{font-weight:700;font-size:14px;color:var(--primary);margin-bottom:2px}
+.tank-type{font-size:12px;color:var(--text-light);margin-bottom:10px}
+.tank-nums{display:flex;justify-content:space-between;font-size:12px;color:var(--text-light);margin-bottom:5px}
+.tank-bar{height:14px;background:#e2e8f0;border-radius:8px;overflow:hidden}
+.tank-fill{height:100%;border-radius:8px;transition:width .5s}
+.tank-fill.tf-green{background:linear-gradient(90deg,var(--success),#2ecc71)}
+.tank-fill.tf-yellow{background:linear-gradient(90deg,var(--warning),#f1c40f)}
+.tank-fill.tf-red{background:linear-gradient(90deg,var(--danger),#e74c3c)}
+.tank-pct{font-size:12px;font-weight:700;margin-top:4px;text-align:left}
+.tanks-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px;margin-bottom:22px}
+
+/* ===================== ATTACHMENTS ===================== */
+.att-list{display:flex;flex-direction:column;gap:7px;margin-top:8px}
+.att-item{display:flex;align-items:center;gap:10px;padding:9px 12px;
+  background:#f8fafc;border:1px solid var(--border);border-radius:7px}
+.att-icon{font-size:20px;flex-shrink:0}
+.att-name{flex:1;font-size:13px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.att-size{font-size:11px;color:var(--text-light);flex-shrink:0}
+.att-actions{display:flex;gap:5px;flex-shrink:0}
+.upload-area{border:2px dashed var(--border);border-radius:8px;padding:20px;text-align:center;
+  cursor:pointer;transition:border-color .2s;color:var(--text-light);font-size:13px}
+.upload-area:hover{border-color:var(--accent);color:var(--accent)}
+
+/* ===================== PHOTO ===================== */
+.vehicle-photo{width:48px;height:38px;object-fit:cover;border-radius:6px;border:1px solid var(--border)}
+.photo-preview{width:100%;max-height:180px;object-fit:cover;border-radius:8px;margin-top:8px;
+  border:1px solid var(--border);display:none}
+.photo-preview.show{display:block}
+
+/* ===================== NOTE ITEM ===================== */
+.note-item{background:#fafbfd;border:1px solid var(--border);border-radius:8px;padding:13px;margin-bottom:8px}
+.note-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px}
+.note-author{font-size:12px;color:var(--text-light)}
+.note-text{font-size:13.5px;line-height:1.6}
+
+/* ===================== PROGRESS BADGE ===================== */
+.progress-wrap{min-width:80px}
+.progress-bar{height:6px;background:#e2e8f0;border-radius:4px;overflow:hidden;margin-top:3px}
+.progress-fill{height:100%;border-radius:4px;transition:width .4s}
+
+/* ===================== MISC ===================== */
+.code-tag{background:#f0f2f7;padding:2px 7px;border-radius:5px;font-family:monospace;font-size:12px}
+.text-muted{color:var(--text-light)}
+.text-success{color:var(--success)}.text-danger{color:var(--danger)}.text-warning{color:#b7770d}
+.mt-1{margin-top:4px}.mt-2{margin-top:8px}.mt-3{margin-top:14px}
+.mb-0{margin-bottom:0!important}
+.d-flex{display:flex}.align-center{align-items:center}.gap-2{gap:8px}.gap-1{gap:4px}
+.flex-1{flex:1}.ml-auto{margin-right:auto}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+.fw-bold{font-weight:700}
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px}
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.info-row{display:flex;flex-direction:column;gap:2px;padding:10px;background:#f8fafc;border-radius:7px}
+.info-label{font-size:11px;color:var(--text-light);font-weight:600}
+.info-value{font-size:13.5px;font-weight:600;color:var(--text)}
+
+/* ===================== RESPONSIVE ===================== */
+@media(max-width:900px){
+  .grid-2,.grid-3{grid-template-columns:1fr}
+  .perm-grid{grid-template-columns:1fr}
+}
+@media(max-width:768px){
+  .sidebar{transform:translateX(100%)}
+  .sidebar.open{transform:translateX(0)}
+  #sidebarOverlay.show{display:block}
+  .main-content{margin-right:0}
+  .page-body{padding:14px}
+  .mobile-menu-btn{display:block}
+  .stat-grid{grid-template-columns:1fr 1fr}
+  .form-row,.form-row-3{grid-template-columns:1fr}
+  .top-bar{padding:0 14px}
+  .tanks-grid{grid-template-columns:1fr}
+}
+@media(max-width:480px){
+  .stat-grid{grid-template-columns:1fr}
+  .login-box{padding:32px 22px}
+}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+</head>
+<body>
+
+<!-- ==================== LOGIN ==================== -->
+<div id="loginPage">
+  <div class="login-box">
+    <span class="login-logo">⛽</span>
+    <h1>نظام إدارة المحروقات</h1>
+    <p class="login-sub">شركة المقاولات — تسجيل الدخول</p>
+    <div id="loginError"></div>
+    <form onsubmit="handleLogin(event)" autocomplete="off">
+      <div class="form-group">
+        <label>اسم المستخدم</label>
+        <input class="form-control" id="li_user" placeholder="أدخل اسم المستخدم" required>
+      </div>
+      <div class="form-group mb-0">
+        <label>كلمة المرور</label>
+        <input class="form-control" type="password" id="li_pass" placeholder="أدخل كلمة المرور" required>
+      </div>
+      <div style="margin-top:22px">
+        <button type="submit" class="btn btn-primary btn-full" id="loginBtn">دخول</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ==================== APP ==================== -->
+<div id="app" style="display:none">
+  <div id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-icon">⛽</div>
+      <div class="brand-text">
+        <h2 id="companyName">نظام المحروقات</h2>
+        <small>لوحة التحكم</small>
+      </div>
+    </div>
+    <nav class="sidebar-nav" id="sidebarNav"></nav>
+    <div class="sidebar-footer">
+      <div class="user-card">
+        <div class="un" id="sbUserName">-</div>
+        <div class="ur" id="sbUserRole"></div>
+      </div>
+      <div id="sbPwdBtn"></div>
+      <button class="btn-logout" onclick="logout()">↩ تسجيل الخروج</button>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <div class="main-content">
+    <header class="top-bar">
+      <div class="top-bar-left">
+        <button class="mobile-menu-btn" onclick="toggleSidebar()">☰</button>
+        <h1 id="pageTitle">لوحة التحكم</h1>
+      </div>
+      <div class="top-bar-right" id="topActions"></div>
+    </header>
+    <div class="page-body" id="pageBody"></div>
+  </div>
+</div>
+
+<!-- ==================== MODAL ==================== -->
+<div class="modal-overlay" id="modalOverlay" style="display:none" onclick="onOverlayClick(event)">
+  <div class="modal-box" id="modalBox">
+    <div class="modal-head">
+      <h3 id="modalTitle"></h3>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+    <div class="modal-foot" id="modalFoot"></div>
+  </div>
+</div>
+
+<!-- ==================== CONFIRM ==================== -->
+<div class="confirm-overlay" id="confirmOverlay" style="display:none">
+  <div class="confirm-box">
+    <div class="confirm-icon">⚠️</div>
+    <h3>تأكيد الإجراء</h3>
+    <p id="confirmMsg"></p>
+    <div class="confirm-actions">
+      <button class="btn btn-danger" id="confirmYesBtn">تأكيد</button>
+      <button class="btn btn-secondary" onclick="closeConfirm()">إلغاء</button>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== TOAST ==================== -->
+<div id="toastBox"></div>
+
+<script>
+'use strict';
+
+/* ============================================================
+   PERMISSIONS DEFINITIONS
+   ============================================================ */
+const PERM_SECTIONS = [
+  { id:'vehicles',    label:'إدارة السيارات',     icon:'🚛',
+    perms:[{key:'vehicles_view',label:'عرض السيارات'},{key:'vehicles_add',label:'إضافة سيارة'},
+           {key:'vehicles_edit',label:'تعديل سيارة'},{key:'vehicles_delete',label:'حذف سيارة'}]},
+  { id:'groups',      label:'إدارة المجموعات',    icon:'📁',
+    perms:[{key:'groups_view',label:'عرض المجموعات'},{key:'groups_add',label:'إضافة مجموعة'},
+           {key:'groups_edit',label:'تعديل مجموعة'},{key:'groups_delete',label:'حذف مجموعة'}]},
+  { id:'projects',    label:'إدارة المشاريع',     icon:'🏗️',
+    perms:[{key:'projects_view',label:'عرض المشاريع'},{key:'projects_add',label:'إضافة مشروع'},
+           {key:'projects_edit',label:'تعديل مشروع'},{key:'projects_delete',label:'حذف مشروع'}]},
+  { id:'tanks',       label:'التانكيات',           icon:'🛢️',
+    perms:[{key:'tanks_view',label:'عرض التانكيات'},{key:'tanks_add',label:'إضافة تانكي'},
+           {key:'tanks_edit',label:'تعديل تانكي'},{key:'tanks_delete',label:'حذف تانكي'}]},
+  { id:'fuel',        label:'المحروقات',           icon:'⛽',
+    perms:[{key:'fuel_view',label:'عرض المحروقات'},{key:'fuel_add',label:'إضافة تعبئة'},
+           {key:'fuel_edit',label:'تعديل تعبئة'},{key:'fuel_delete',label:'حذف تعبئة'}]},
+  { id:'maintenance', label:'الصيانة',             icon:'🔧',
+    perms:[{key:'maintenance_view',label:'عرض الصيانة'},{key:'maintenance_add',label:'إضافة صيانة'},
+           {key:'maintenance_edit',label:'تعديل صيانة'},{key:'maintenance_delete',label:'حذف صيانة'}]},
+  { id:'notes',       label:'الملاحظات',           icon:'📝',
+    perms:[{key:'notes_view',label:'عرض الملاحظات'},{key:'notes_add',label:'إضافة ملاحظة'},
+           {key:'notes_edit',label:'تعديل ملاحظة'},{key:'notes_delete',label:'حذف ملاحظة'}]},
+  { id:'invoices',    label:'الفواتير',            icon:'🧾',
+    perms:[{key:'invoices_view',label:'عرض الفواتير'},{key:'invoices_add',label:'رفع فاتورة'},
+           {key:'invoices_delete',label:'حذف فاتورة'}]},
+  { id:'reports',     label:'التقارير',            icon:'📊',
+    perms:[{key:'reports_view',label:'عرض التقارير'},{key:'reports_export_excel',label:'تصدير Excel'},
+           {key:'reports_export_pdf',label:'تصدير / طباعة'}]},
+  { id:'users',       label:'إدارة المستخدمين',   icon:'👥',
+    perms:[{key:'users_view',label:'عرض المستخدمين'},{key:'users_add',label:'إضافة مستخدم'},
+           {key:'users_edit',label:'تعديل مستخدم'},{key:'users_delete',label:'حذف مستخدم'}]},
+  { id:'activity',    label:'سجل النشاط',          icon:'📋',
+    perms:[{key:'activity_view',label:'عرض سجل النشاط'}]},
+  { id:'settings',    label:'الإعدادات',           icon:'⚙️',
+    perms:[{key:'settings_manage',label:'إدارة إعدادات النظام'}]},
+  { id:'backup',      label:'النسخ الاحتياطي',    icon:'💾',
+    perms:[{key:'backup_create',label:'إنشاء نسخة احتياطية'},{key:'backup_restore',label:'استعادة نسخة'}]},
+  { id:'drivers',     label:'إدارة السائقين',     icon:'👤',
+    perms:[{key:'drivers_view',label:'عرض السائقين'},{key:'drivers_add',label:'إضافة سائق'},
+           {key:'drivers_edit',label:'تعديل سائق'},{key:'drivers_delete',label:'حذف سائق'}]},
+  { id:'fuel_approve',label:'اعتماد التعبئات',    icon:'✅',
+    perms:[{key:'fuel_approve',label:'اعتماد التعبئة'},{key:'fuel_reject',label:'رفض التعبئة'}]},
+  { id:'fuel_prices', label:'أسعار الوقود',       icon:'💲',
+    perms:[{key:'fuel_prices_view',label:'عرض أسعار الوقود'},{key:'fuel_prices_edit',label:'تعديل أسعار الوقود'}]},
+  { id:'fuel_movement',label:'سجل حركة الوقود',  icon:'📈',
+    perms:[{key:'fuel_movement_view',label:'عرض سجل حركة الوقود'}]},
+];
+
+function getAllPerms(){
+  const p={};
+  PERM_SECTIONS.forEach(s=>s.perms.forEach(pr=>{p[pr.key]=true;}));
+  return p;
+}
+
+/* ============================================================
+   CRYPTO — SHA-256
+   ============================================================ */
+function _sha256js(s){
+  function r(n,d){return(n>>>d)|(n<<(32-d));}
+  const K=[0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,0xd192e819,0xd6990624,0xf40e3585,0x106aa070,0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2];
+  let H=[0x6a09e667,0xbb67ae85,0x3c6ef372,0xa54ff53a,0x510e527f,0x9b05688c,0x1f83d9ab,0x5be0cd19];
+  const by=[];
+  for(let i=0;i<s.length;i++){const c=s.charCodeAt(i);if(c<0x80)by.push(c);else if(c<0x800)by.push(0xc0|(c>>6),0x80|(c&0x3f));else if(c<0x10000)by.push(0xe0|(c>>12),0x80|((c>>6)&0x3f),0x80|(c&0x3f));else by.push(0xf0|(c>>18),0x80|((c>>12)&0x3f),0x80|((c>>6)&0x3f),0x80|(c&0x3f));}
+  const L=by.length;by.push(0x80);
+  while(by.length%64!==56)by.push(0);
+  const bL=L*8;by.push(0,0,0,0,(bL>>>24)&0xff,(bL>>>16)&0xff,(bL>>>8)&0xff,bL&0xff);
+  for(let i=0;i<by.length;i+=64){
+    const W=[];
+    for(let j=0;j<16;j++)W.push((by[i+j*4]<<24)|(by[i+j*4+1]<<16)|(by[i+j*4+2]<<8)|by[i+j*4+3]);
+    for(let j=16;j<64;j++)W.push(((r(W[j-2],17)^r(W[j-2],19)^(W[j-2]>>>10))+W[j-7]+(r(W[j-15],7)^r(W[j-15],18)^(W[j-15]>>>3))+W[j-16])|0);
+    let a=H[0],b=H[1],c=H[2],d=H[3],e=H[4],f=H[5],g=H[6],h=H[7];
+    for(let j=0;j<64;j++){const t1=(h+(r(e,6)^r(e,11)^r(e,25))+((e&f)^(~e&g))+K[j]+W[j])|0,t2=((r(a,2)^r(a,13)^r(a,22))+((a&b)^(a&c)^(b&c)))|0;h=g;g=f;f=e;e=(d+t1)|0;d=c;c=b;b=a;a=(t1+t2)|0;}
+    H[0]=(H[0]+a)|0;H[1]=(H[1]+b)|0;H[2]=(H[2]+c)|0;H[3]=(H[3]+d)|0;H[4]=(H[4]+e)|0;H[5]=(H[5]+f)|0;H[6]=(H[6]+g)|0;H[7]=(H[7]+h)|0;
+  }
+  return H.map(v=>(v>>>0).toString(16).padStart(8,'0')).join('');
+}
+async function hashPwd(raw){
+  const msg='fms_v2_salt::'+raw;
+  if(typeof crypto!=='undefined'&&crypto.subtle){
+    try{const enc=new TextEncoder(),buf=await crypto.subtle.digest('SHA-256',enc.encode(msg));return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');}catch{}
+  }
+  return _sha256js(msg);
+}
+function isHashed(s){return typeof s==='string'&&s.length===64&&/^[0-9a-f]+$/.test(s);}
+
+/* ============================================================
+   ⚙️ FIREBASE CONFIG
+   ============================================================ */
+const FIREBASE_CONFIG = {
+  databaseURL: "https://fuel-system-fa6ad-default-rtdb.firebaseio.com"
+};
+
+/* ============================================================
+   DATABASE  (localStorage cache + Firebase REST API sync)
+   ============================================================ */
+const SYNC_TABLES=['users','groups','projects','vehicles','tanks','tankFills','fuel',
+  'maintenance','notes','invoices','attachments','activity','drivers','fuelMovements'];
+
+const _lwts={};
+let _fbBase=null;
+let _sseSource=null;
+
+const DB={
+  _k:t=>'fm2_'+t,
+
+  /* ─── READ (from localStorage) ─── */
+  get(t){try{return JSON.parse(localStorage.getItem(this._k(t))||'[]');}catch{return[];}},
+  all(t){return this.get(t);},
+  find(t,id){return this.get(t).find(r=>r.id===id);},
+
+  /* ─── WRITE (localStorage + Firebase REST) ─── */
+  set(t,d){
+    try{
+      localStorage.setItem(this._k(t),JSON.stringify(d));
+      if(_fbBase){
+        _lwts[t]=Date.now();
+        const obj={};
+        (Array.isArray(d)?d:[]).forEach(item=>{
+          if(item&&item.id){
+            const k=String(item.id).replace(/[.#$[\]/]/g,'_');
+            obj[k]=item;
+          }
+        });
+        fetch(`${_fbBase}/fms/${t}.json`,{
+          method:'PUT',
+          body:JSON.stringify(Object.keys(obj).length?obj:null),
+          headers:{'Content-Type':'application/json'}
+        }).catch(e=>console.error('FB write:',e));
+      }
+    }catch(e){}
+  },
+
+  add(t,item){
+    const d=this.get(t);
+    item.id=Date.now().toString(36)+Math.random().toString(36).slice(2,5);
+    item.createdAt=new Date().toISOString();
+    d.push(item);this.set(t,d);return item;
+  },
+  update(t,id,u){
+    const d=this.get(t),i=d.findIndex(r=>r.id===id);
+    if(i===-1)return null;
+    d[i]={...d[i],...u,updatedAt:new Date().toISOString()};
+    this.set(t,d);return d[i];
+  },
+  del(t,id){this.set(t,this.get(t).filter(r=>r.id!==id));},
+
+  cfg:{
+    get(k){try{return JSON.parse(localStorage.getItem('fm2_cfg_'+k)||'null');}catch{return null;}},
+    set(k,v){
+      localStorage.setItem('fm2_cfg_'+k,JSON.stringify(v));
+      if(_fbBase){
+        fetch(`${_fbBase}/fms_cfg/${k}.json`,{
+          method:'PUT',
+          body:JSON.stringify(v),
+          headers:{'Content-Type':'application/json'}
+        }).catch(e=>console.error('FB cfg:',e));
+      }
+    }
+  },
+
+  /* ─── INIT ─── */
+  async initFirebase(){
+    try{
+      const url=(FIREBASE_CONFIG.databaseURL||'').replace(/\/$/,'');
+      if(!url||url.includes('REPLACE')){console.warn('Firebase not configured.');return;}
+      _fbBase=url;
+      _showFbLoading(true);
+      await this._loadAll();
+      this._startSSE();
+      _showFbLoading(false);
+    }catch(e){
+      console.error('Firebase init failed:',e);
+      _showFbLoading(false);
+    }
+  },
+
+  async _loadAll(){
+    const ps=SYNC_TABLES.map(t=>
+      fetch(`${_fbBase}/fms/${t}.json`)
+        .then(r=>r.ok?r.json():null)
+        .then(val=>{
+          if(val&&typeof val==='object'){
+            const data=Object.values(val).filter(i=>i&&i.id);
+            localStorage.setItem(DB._k(t),JSON.stringify(data));
+          }
+        }).catch(()=>{})
+    );
+    await Promise.all(ps);
+    try{
+      const r=await fetch(`${_fbBase}/fms_cfg/settings.json`);
+      const val=await r.json();
+      if(val)localStorage.setItem('fm2_cfg_settings',JSON.stringify(val));
+    }catch{}
+  },
+
+  _startSSE(){
+    if(_sseSource)_sseSource.close();
+    try{
+      _sseSource=new EventSource(`${_fbBase}/fms.json`);
+      _sseSource.addEventListener('put',e=>{
+        try{
+          const msg=JSON.parse(e.data);
+          const path=(msg.path||'/').replace(/^\//,'');
+          const val=msg.data;
+          if(!path){
+            // Full snapshot
+            if(val&&typeof val==='object'){
+              SYNC_TABLES.forEach(t=>{
+                if(val[t]&&(!_lwts[t]||Date.now()-_lwts[t]>3000)){
+                  const items=Object.values(val[t]).filter(i=>i&&i.id);
+                  localStorage.setItem(DB._k(t),JSON.stringify(items));
+                }
+              });
+              DB._refreshUI();
+            }
+          }else if(SYNC_TABLES.includes(path)){
+            if(_lwts[path]&&Date.now()-_lwts[path]<3000)return;
+            const items=val?Object.values(val).filter(i=>i&&i.id):[];
+            localStorage.setItem(DB._k(path),JSON.stringify(items));
+            DB._refreshUI();
+          }
+        }catch{}
+      });
+      _sseSource.onerror=()=>{
+        _sseSource.close();
+        setTimeout(()=>DB._startSSE(),6000);
+      };
+    }catch(e){console.warn('SSE not available:',e);}
+  },
+
+  _refreshUI(){
+    const app=document.getElementById('app');
+    if(app&&app.style.display!=='none'&&typeof currentPage!=='undefined'&&currentPage){
+      try{navigate(currentPage);}catch{}
+    }
+  }
+};
+
+function _showFbLoading(show){
+  let el=document.getElementById('_fbLoadOverlay');
+  if(show){
+    if(!el){
+      el=document.createElement('div');
+      el.id='_fbLoadOverlay';
+      el.style.cssText='position:fixed;inset:0;background:rgba(26,39,68,.92);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;font-family:Cairo,sans-serif;gap:16px;';
+      el.innerHTML='<div style="font-size:52px">⛽</div><div style="font-size:18px;font-weight:700">جارٍ الاتصال بقاعدة البيانات...</div><div style="width:220px;height:6px;background:rgba(255,255,255,.2);border-radius:4px;overflow:hidden"><div style="width:60%;height:100%;background:#e67e22;border-radius:4px;animation:_fbPulse 1.2s ease-in-out infinite alternate"></div></div><style>@keyframes _fbPulse{from{width:30%}to{width:90%}}</style>';
+      document.body.appendChild(el);
+    }
+    el.style.display='flex';
+  }else{
+    if(el)el.style.display='none';
+  }
+}
+
+/* ============================================================
+   SETTINGS
+   ============================================================ */
+const SETTING_DEFAULTS={
+  company_name:'شركة المقاولات',
+  diesel_price:'0.75',
+  petrol91_price:'0.67',
+  petrol95_price:'0.72',
+  alert_days:'30',
+  tank_alert_pct:'20',
+  unfueled_days:'14',
+};
+function getSettings(){
+  const saved=DB.cfg.get('settings')||{};
+  return {...SETTING_DEFAULTS,...saved};
+}
+function getSetting(k){return getSettings()[k]||SETTING_DEFAULTS[k];}
+function saveSettings(obj){DB.cfg.set('settings',{...getSettings(),...obj});}
+function fuelPrice(fuelType){
+  const s=getSettings();
+  if(fuelType==='ديزل')return parseFloat(s.diesel_price||0.75);
+  if(fuelType==='بنزين 91')return parseFloat(s.petrol91_price||0.67);
+  if(fuelType==='بنزين 95')return parseFloat(s.petrol95_price||0.72);
+  return 1;
+}
+
+/* ============================================================
+   ACTIVITY LOG
+   ============================================================ */
+function logAct(action,details=''){
+  if(!currentUser)return;
+  const logs=DB.all('activity');
+  logs.push({id:Date.now().toString(36)+Math.random().toString(36).slice(2,5),
+    createdAt:new Date().toISOString(),userId:currentUser.id,
+    userName:currentUser.name,action,details});
+  DB.set('activity',logs.length>2000?logs.slice(-2000):logs);
+}
+function logFuelMovement(tankId,type,liters,balanceBefore,balanceAfter,entityType,entityId){
+  if(!currentUser)return;
+  const tk=DB.find('tanks',tankId);
+  DB.add('fuelMovements',{tankId,tankName:tk?.name||'',type,liters,
+    balanceBefore,balanceAfter,entityType,entityId,
+    userId:currentUser.id,userName:currentUser.name});
+}
+
+/* ============================================================
+   AUTH
+   ============================================================ */
+let currentUser=null;
+
+async function doLogin(username,password){
+  const users=DB.get('users');
+  const user=users.find(u=>u.username.toLowerCase()===username.toLowerCase());
+  if(!user)return false;
+  const h=await hashPwd(password);
+  if(user.password!==h)return false;
+  currentUser=user;
+  sessionStorage.setItem('fm2_sess',JSON.stringify({id:user.id}));
+  logAct('تسجيل دخول','');
+  return true;
+}
+
+function logout(){
+  logAct('تسجيل خروج','');
+  currentUser=null;
+  sessionStorage.removeItem('fm2_sess');
+  showLogin();
+}
+
+function checkSession(){
+  try{
+    const s=JSON.parse(sessionStorage.getItem('fm2_sess')||'null');
+    if(!s)return false;
+    const u=DB.find('users',s.id);
+    if(!u)return false;
+    currentUser=u;return true;
+  }catch{return false;}
+}
+
+function isOwner(){return currentUser?.role==='owner';}
+function can(perm){
+  if(!currentUser)return false;
+  if(currentUser.role==='owner')return true;
+  return !!(currentUser.permissions&&currentUser.permissions[perm]);
+}
+
+/* ============================================================
+   INIT / MIGRATION
+   ============================================================ */
+async function initApp(){
+  // Initialize Firebase (if configured)
+  await DB.initFirebase();
+
+  // Migrate plaintext passwords
+  const users=DB.get('users');
+  let changed=false;
+  for(const u of users){
+    if(u.password&&!isHashed(u.password)){
+      u.password=await hashPwd(u.password);changed=true;
+    }
+    // Give legacy admin/user full or default perms
+    if(!u.permissions){
+      u.permissions=u.role==='admin'?getAllPerms():{};changed=true;
+    }
+  }
+  if(changed)DB.set('users',users);
+
+  // Ensure owner exists
+  if(!DB.all('users').find(u=>u.role==='owner')){
+    const hp=await hashPwd('owner@2024');
+    const all=DB.get('users');
+    all.unshift({id:'_owner_',username:'owner',password:hp,name:'المالك الرئيسي',
+      role:'owner',permissions:getAllPerms(),createdAt:new Date().toISOString()});
+    DB.set('users',all);
+  }
+
+  // Seed groups
+  if(DB.get('groups').length===0){
+    ['قلابات','شيولات','حفارات','معدات ثقيلة','سيارات خدمة'].forEach(name=>DB.add('groups',{name}));
+  }
+}
+
+/* ============================================================
+   UI HELPERS
+   ============================================================ */
+function showLogin(){
+  document.getElementById('loginPage').style.display='flex';
+  document.getElementById('app').style.display='none';
+}
+function showApp(){
+  document.getElementById('loginPage').style.display='none';
+  document.getElementById('app').style.display='flex';
+  document.getElementById('companyName').textContent=getSetting('company_name');
+  buildSidebar();
+  // Driver users go to their own dashboard
+  if(isDriverUser()) navigate('driverDashboard');
+  else navigate('dashboard');
+}
+
+/* ---- Toast ---- */
+function toast(msg,type='success'){
+  const icons={success:'✅',error:'❌',info:'ℹ️',warning:'⚠️'};
+  const el=document.createElement('div');
+  el.className=`toast t-${type}`;
+  const ic=document.createElement('span');ic.textContent=icons[type]||'•';
+  const tx=document.createElement('span');tx.textContent=msg;
+  el.appendChild(ic);el.appendChild(tx);
+  document.getElementById('toastBox').appendChild(el);
+  setTimeout(()=>{el.style.opacity='0';el.style.transform='translateX(-16px)';
+    el.style.transition='.3s';setTimeout(()=>el.remove(),320);},3200);
+}
+
+/* ---- Modal ---- */
+let _modalSave=null;
+function openModal(title,body,saveLabel,onSave,opts={}){
+  document.getElementById('modalTitle').textContent=title;
+  document.getElementById('modalBody').innerHTML=body;
+  const box=document.getElementById('modalBox');
+  box.className='modal-box'+(opts.wide?' wide':'')+(opts.full?' full':'');
+  const foot=document.getElementById('modalFoot');
+  foot.innerHTML=(onSave?`<button class="btn btn-primary" onclick="_doModalSave()">${saveLabel||'حفظ'}</button>`:'')+
+    `<button class="btn btn-secondary" onclick="closeModal()">إلغاء</button>`;
+  _modalSave=onSave;
+  document.getElementById('modalOverlay').style.display='flex';
+  setTimeout(()=>{const f=document.querySelector('#modalBody .form-control');if(f)f.focus();},120);
+}
+let _modalSaving=false;
+function _doModalSave(){if(_modalSaving||!_modalSave)return;_modalSaving=true;_modalSave();setTimeout(()=>_modalSaving=false,600);}
+function closeModal(){_modalSaving=false;document.getElementById('modalOverlay').style.display='none';_modalSave=null;_fuelVPreset='';}
+function onOverlayClick(e){if(_modalSaving)return;if(e.target.id==='modalOverlay')closeModal();}
+
+/* ---- Confirm ---- */
+let _confirmCb=null;
+function confirm2(msg,cb){
+  if(document.getElementById('confirmOverlay').style.display==='flex')return;
+  document.getElementById('confirmMsg').textContent=msg||'هل أنت متأكد؟';
+  _confirmCb=cb;
+  document.getElementById('confirmOverlay').style.display='flex';
+  document.getElementById('confirmYesBtn').onclick=()=>{if(_confirmCb)_confirmCb();closeConfirm();};
+}
+function closeConfirm(){document.getElementById('confirmOverlay').style.display='none';_confirmCb=null;}
+
+/* ---- Helpers ---- */
+function esc(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function today(){const d=new Date();return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
+
+function fmtDate(v){
+  if(!v)return'-';
+  try{return new Date(v).toLocaleDateString('ar-SA',{year:'numeric',month:'short',day:'numeric'});}
+  catch{return v;}
+}
+function fmtDateTime(v){
+  if(!v)return'-';
+  try{const d=new Date(v);return d.toLocaleDateString('ar-SA',{year:'numeric',month:'short',day:'numeric'})+' '+d.toLocaleTimeString('ar-SA',{hour:'2-digit',minute:'2-digit'});}
+  catch{return v;}
+}
+function fmtNum(n){return parseFloat(n||0).toLocaleString('ar');}
+function daysUntil(dateStr){
+  if(!dateStr)return null;
+  const [y,m,d]=dateStr.split('-').map(Number);
+  const target=new Date(y,m-1,d);
+  const now=new Date();now.setHours(0,0,0,0);
+  const diff=target-now;
+  return Math.ceil(diff/(1000*60*60*24));
+}
+function fileIcon(type){
+  if(!type)return'📎';
+  if(type.includes('pdf'))return'📄';
+  if(type.includes('image'))return'🖼️';
+  return'📎';
+}
+function fmtFileSize(bytes){
+  if(!bytes)return'';
+  if(bytes<1024)return bytes+'B';
+  if(bytes<1024*1024)return(bytes/1024).toFixed(1)+'KB';
+  return(bytes/(1024*1024)).toFixed(1)+'MB';
+}
+
+/* ---- Sidebar ---- */
+function toggleSidebar(){
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sidebarOverlay').classList.toggle('show');
+}
+function closeSidebar(){
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebarOverlay').classList.remove('show');
+}
+
+const NAV_ITEMS=[
+  {page:'dashboard', icon:'📊', label:'لوحة التحكم',    perm:null},
+  {page:'projects',  icon:'🏗️', label:'المشاريع',       perm:'projects_view'},
+  {page:'groups',    icon:'📁', label:'المجموعات',      perm:'groups_view'},
+  {page:'vehicles',  icon:'🚛', label:'السيارات',       perm:'vehicles_view'},
+  {page:'tanks',     icon:'🛢️', label:'التانكيات',      perm:'tanks_view'},
+  {page:'fuel',      icon:'⛽', label:'المحروقات',      perm:'fuel_view'},
+  {page:'maintenance',icon:'🔧',label:'الصيانة',        perm:'maintenance_view'},
+  {page:'notes',     icon:'📝', label:'الملاحظات',      perm:'notes_view'},
+  {page:'invoices',      icon:'🧾', label:'الفواتير',          perm:'invoices_view'},
+  {page:'reports',       icon:'📊', label:'التقارير',          perm:'reports_view'},
+  {page:'drivers',       icon:'👤', label:'السائقون',          perm:'drivers_view'},
+  {page:'fuelMovement',  icon:'📈', label:'حركة الوقود',       perm:'fuel_movement_view'},
+  {page:'users',         icon:'👥', label:'المستخدمون',        perm:'users_view'},
+  {page:'activity',      icon:'📋', label:'سجل النشاط',        perm:'activity_view'},
+  {page:'settings',      icon:'⚙️', label:'الإعدادات',         perm:'settings_manage',ownerOrAdmin:true},
+  {page:'backup',        icon:'💾', label:'النسخ الاحتياطي',   perm:'backup_create',ownerOnly:true},
+];
+
+const DRIVER_NAV=[
+  {page:'driverDashboard',icon:'🏠',label:'لوحة السائق'},
+  {page:'fuel',           icon:'⛽',label:'تسجيل تعبئة'},
+  {page:'notes',          icon:'📝',label:'ملاحظات مركباتي'},
+];
+
+function buildSidebar(){
+  const nav=document.getElementById('sidebarNav');
+  const driver=isDriverUser();
+
+  if(driver){
+    // Simplified driver navigation
+    nav.innerHTML=DRIVER_NAV.map(item=>`<button class="nav-btn" onclick="navigate('${item.page}')" data-page="${item.page}">
+      <span class="ni">${item.icon}</span>${item.label}
+    </button>`).join('');
+  } else {
+    nav.innerHTML=NAV_ITEMS.filter(item=>{
+      if(item.ownerOnly&&!isOwner())return false;
+      if(item.ownerOrAdmin&&!isOwner()&&currentUser?.role!=='admin'&&!can(item.perm))return false;
+      if(item.perm&&!can(item.perm))return false;
+      return true;
+    }).map(item=>`<button class="nav-btn" onclick="navigate('${item.page}')" data-page="${item.page}">
+      <span class="ni">${item.icon}</span>${item.label}
+    </button>`).join('');
+  }
+
+  const u=currentUser;
+  document.getElementById('sbUserName').textContent=u?.name||'-';
+  document.getElementById('sbPwdBtn').innerHTML=(u?.role==='owner'||u?.role==='admin')
+    ?`<button class="btn btn-sm btn-secondary" style="width:100%;margin-bottom:6px;font-size:12px" onclick="changeMyPassword()">🔑 تغيير كلمة المرور</button>`:'';
+  const d=getLinkedDriver();
+  document.getElementById('sbUserRole').innerHTML= d
+    ? `<span class="role-chip" style="background:rgba(39,174,96,.2);color:#55efc4">🚗 سائق</span>`
+    : `<span class="role-chip ${u?.role==='owner'?'role-owner':u?.role==='admin'?'role-admin':'role-user'}">${{owner:'المالك',admin:'مدير',user:'مستخدم'}[u?.role]||'مستخدم'}</span>`;
+}
+
+async function changeMyPassword(){
+  if(currentUser?.role!=='owner'&&currentUser?.role!=='admin'){
+    toast('ليس لديك صلاحية','error');
+    return;
+  }
+  openModal('🔑 تغيير كلمة المرور',`
+    <div class="form-group"><label>كلمة المرور الحالية <span class="req">*</span></label>
+      <input class="form-control" type="password" id="cpwd_cur" autocomplete="current-password"></div>
+    <div class="form-group"><label>كلمة المرور الجديدة <span class="req">*</span></label>
+      <input class="form-control" type="password" id="cpwd_new" autocomplete="new-password"></div>
+    <div class="form-group"><label>تأكيد كلمة المرور الجديدة <span class="req">*</span></label>
+      <input class="form-control" type="password" id="cpwd_con" autocomplete="new-password"></div>`,
+    'حفظ', async ()=>{
+      const cur=document.getElementById('cpwd_cur').value;
+      const nw=document.getElementById('cpwd_new').value;
+      const con=document.getElementById('cpwd_con').value;
+      if(!cur||!nw||!con){toast('أدخل جميع الحقول','error');return;}
+      if(nw.length<6){toast('كلمة المرور الجديدة 6 أحرف على الأقل','error');return;}
+      if(nw!==con){toast('كلمتا المرور غير متطابقتين','error');return;}
+      const h=await hashPwd(cur);
+      const u=DB.find('users',currentUser.id);
+      if(u?.password!==h){toast('كلمة المرور الحالية غير صحيحة','error');return;}
+      try{
+        const nh=await hashPwd(nw);
+        DB.update('users',currentUser.id,{password:nh});
+        currentUser={...currentUser,password:nh};
+        logAct('تغيير كلمة المرور','');
+        toast('✅ تم تغيير كلمة المرور بنجاح');
+        closeModal();
+      }catch{toast('خطأ في تشفير كلمة المرور','error');}
+    });
+}
+function setActiveNav(page){
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.toggle('active',b.dataset.page===page));
+}
+
+/* ============================================================
+   NAVIGATION
+   ============================================================ */
+const PAGE_TITLES={
+  dashboard:'لوحة التحكم',driverDashboard:'لوحة السائق',
+  projects:'إدارة المشاريع',groups:'إدارة المجموعات',
+  vehicles:'السيارات والمعدات',tanks:'التانكيات',fuel:'سجل المحروقات',
+  maintenance:'الصيانة',notes:'الملاحظات',invoices:'الفواتير',
+  reports:'التقارير',drivers:'إدارة السائقين',fuelMovement:'سجل حركة الوقود',
+  users:'إدارة المستخدمين',activity:'سجل النشاط',
+  settings:'الإعدادات',backup:'النسخ الاحتياطي',
+};
+
+function navigate(page,...args){
+  currentPage=page;
+  const item=NAV_ITEMS.find(n=>n.page===page);
+  if(item){
+    if(item.ownerOnly&&!isOwner()){toast('هذه الصفحة للمالك الرئيسي فقط','error');return;}
+    if(item.perm&&!can(item.perm)){toast('ليس لديك صلاحية الوصول','error');return;}
+  }
+  closeSidebar();
+  setActiveNav(page);
+  document.getElementById('pageTitle').textContent=PAGE_TITLES[page]||'';
+  document.getElementById('topActions').innerHTML='';
+  const renders={
+    dashboard:renderDashboard,driverDashboard:renderDriverDashboard,
+    projects:renderProjects,groups:renderGroups,
+    vehicles:renderVehicles,tanks:renderTanks,fuel:renderFuel,
+    maintenance:renderMaintenance,notes:renderNotes,invoices:renderInvoices,
+    reports:renderReports,drivers:renderDrivers,fuelMovement:renderFuelMovement,
+    users:renderUsers,activity:renderActivity,
+    settings:renderSettings,backup:renderBackup,
+  };
+  if(renders[page])renders[page](...args);
+}
+
+/* ============================================================
+   DASHBOARD
+   ============================================================ */
+function renderDashboard(){
+  const vehicles=DB.all('vehicles').filter(v=>!v.archived);
+  const fuel=DB.all('fuel').filter(r=>r.approvalStatus==='approved'||!r.approvalStatus);
+  const projects=DB.all('projects');
+  const maint=DB.all('maintenance');
+  const tanks=DB.all('tanks');
+  const s=getSettings();
+  const alertDays=parseInt(s.alert_days||30,10);
+  const unfueledDays=parseInt(s.unfueled_days||14,10);
+  const tankAlertPct=parseInt(s.tank_alert_pct||20,10);
+
+  const totalFuelCost=fuel.reduce((a,r)=>a+(parseFloat(r.cost)||0),0);
+  const totalMaintCost=maint.reduce((a,r)=>a+(parseFloat(r.cost)||0),0);
+
+  // Build alerts
+  const alerts=[];
+  const now=new Date();
+
+  vehicles.forEach(v=>{
+    // Registration expiry
+    if(v.registrationExpiry){
+      const d=daysUntil(v.registrationExpiry);
+      if(d!==null&&d<=alertDays){
+        const cls=d<=7?'al-danger':'al-warn';
+        const txt=d<=0?`انتهت استمارة ${esc(v.name)}`:`ستنتهي استمارة ${esc(v.name)} خلال ${d} يوم`;
+        alerts.push({cls,icon:'📋',text:txt,sub:`تاريخ الانتهاء: ${fmtDate(v.registrationExpiry)}`});
+      }
+    }
+    // Insurance expiry
+    if(v.insuranceExpiry){
+      const d=daysUntil(v.insuranceExpiry);
+      if(d!==null&&d<=alertDays){
+        const cls=d<=7?'al-danger':'al-warn';
+        const txt=d<=0?`انتهى تأمين ${esc(v.name)}`:`سينتهي تأمين ${esc(v.name)} خلال ${d} يوم`;
+        alerts.push({cls,icon:'🛡️',text:txt,sub:`شركة التأمين: ${esc(v.insuranceCompany||'-')}`});
+      }
+    }
+    // Unfueled vehicles
+    const vFuel=fuel.filter(f=>f.vehicleId===v.id).sort((a,b)=>new Date(b.date||b.createdAt)-new Date(a.date||a.createdAt));
+    if(vFuel.length>0){
+      const lastDate=new Date(vFuel[0].date||vFuel[0].createdAt);
+      const daysSince=Math.floor((now-lastDate)/(1000*60*60*24));
+      if(daysSince>unfueledDays){
+        alerts.push({cls:'al-info',icon:'⛽',text:`${esc(v.name)} لم يتم تعبئتها منذ ${daysSince} يوم`,sub:'يُرجى المتابعة'});
+      }
+    }
+    // Stopped
+    if(v.status==='stopped'){
+      alerts.push({cls:'al-info',icon:'🔴',text:`${esc(v.name)} متوقفة`,sub:`اللوحة: ${esc(v.plate||'-')}`});
+    }
+  });
+
+  // Upcoming maintenance
+  maint.forEach(m=>{
+    if(m.nextDate){
+      const d=daysUntil(m.nextDate);
+      if(d!==null&&d<=alertDays&&d>0){
+        const v=DB.find('vehicles',m.vehicleId);
+        alerts.push({cls:'al-warn',icon:'🔧',text:`صيانة قادمة لـ ${esc(v?.name||'-')} خلال ${d} يوم`,sub:fmtDate(m.nextDate)});
+      }
+    }
+  });
+
+  // Pending approvals alert
+  if(can('fuel_approve')||isOwner()){
+    const pendingCount=DB.all('fuel').filter(r=>!r.approvalStatus||r.approvalStatus==='pending').length;
+    if(pendingCount>0)alerts.push({cls:'al-warn',icon:'✅',text:`${pendingCount} تعبئة بانتظار الاعتماد`,sub:'انقر لمراجعة واعتماد التعبئات'});
+  }
+  // Tank alerts
+  tanks.forEach(tk=>{
+    const pct=tk.capacity>0?Math.round((tk.currentLevel/tk.capacity)*100):0;
+    if(pct<=tankAlertPct){
+      alerts.push({cls:'al-danger',icon:'🛢️',text:`تانكي ${esc(tk.name)} منخفض (${pct}%)`,
+        sub:`الكمية المتبقية: ${fmtNum(tk.currentLevel)} لتر`});
+    }
+  });
+
+  // Recent fuel
+  const recentFuel=[...fuel].sort((a,b)=>new Date(b.date||b.createdAt)-new Date(a.date||a.createdAt)).slice(0,5);
+
+  // Tanks section
+  const tanksHtml=tanks.length>0?`
+    <div class="card">
+      <div class="card-header"><span class="card-title">🛢️ حالة التانكيات</span>
+        ${can('tanks_view')?`<button class="btn btn-sm btn-secondary" onclick="navigate('tanks')">عرض الكل</button>`:''}
+      </div>
+      <div class="card-body">
+        <div class="tanks-grid">
+          ${tanks.map(tk=>{
+            const pct=tk.capacity>0?Math.min(100,Math.round((tk.currentLevel/tk.capacity)*100)):0;
+            const cls=pct>50?'tf-green':pct>20?'tf-yellow':'tf-red';
+            return`<div class="tank-card">
+              <div class="tank-name">${esc(tk.name)}</div>
+              <div class="tank-type">${esc(tk.fuelType)}</div>
+              <div class="tank-nums"><span>الكمية: <strong>${fmtNum(tk.currentLevel)} لتر</strong></span><span>السعة: ${fmtNum(tk.capacity)}</span></div>
+              <div class="tank-bar"><div class="tank-fill ${cls}" style="width:${pct}%"></div></div>
+              <div class="tank-pct" style="color:${pct>50?'var(--success)':pct>20?'var(--warning)':'var(--danger)'}">${pct}% ممتلئ — متبقٍ: ${fmtNum(tk.capacity-tk.currentLevel)} لتر</div>
+            </div>`;
+          }).join('')}
+        </div>
+      </div>
+    </div>`:'';
+
+  document.getElementById('pageBody').innerHTML=`
+    <div class="stat-grid">
+      <div class="stat-card c-blue"><div class="stat-icon">🚛</div><div><div class="stat-val">${vehicles.length}</div><div class="stat-lbl">إجمالي السيارات</div></div></div>
+      <div class="stat-card c-orange"><div class="stat-icon">🏗️</div><div><div class="stat-val">${projects.length}</div><div class="stat-lbl">المشاريع</div></div></div>
+      <div class="stat-card c-green"><div class="stat-icon">⛽</div><div><div class="stat-val">${fuel.length}</div><div class="stat-lbl">عمليات التعبئة</div></div></div>
+      <div class="stat-card c-purple"><div class="stat-icon">🔧</div><div><div class="stat-val">${maint.length}</div><div class="stat-lbl">سجلات الصيانة</div></div></div>
+      <div class="stat-card c-red"><div class="stat-icon">💰</div><div><div class="stat-val">${fmtNum(totalFuelCost)}</div><div class="stat-lbl">تكلفة الوقود (ر.س)</div></div></div>
+      <div class="stat-card c-teal"><div class="stat-icon">🛠️</div><div><div class="stat-val">${fmtNum(totalMaintCost)}</div><div class="stat-lbl">تكلفة الصيانة (ر.س)</div></div></div>
+    </div>
+
+    ${alerts.length>0?`
+    <div class="card">
+      <div class="card-header"><span class="card-title">🔔 مركز التنبيهات</span>
+        <span class="badge b-danger">${alerts.length} تنبيه</span></div>
+      <div class="card-body">
+        <div class="alert-list">
+          ${alerts.map(a=>`<div class="alert-item ${a.cls}">
+            <div class="al-icon">${a.icon}</div>
+            <div class="al-text"><strong>${a.text}</strong><span>${a.sub||''}</span></div>
+          </div>`).join('')}
+        </div>
+      </div>
+    </div>`:''}
+
+    ${tanksHtml}
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-header"><span class="card-title">حالة السيارات</span></div>
+        <div class="card-body">
+          <div class="grid-3">
+            <div style="text-align:center;background:#eafaf1;border-radius:8px;padding:14px">
+              <div style="font-size:26px;font-weight:700;color:var(--success)">${vehicles.filter(v=>v.status==='working').length}</div>
+              <div style="font-size:12px;color:var(--text-light)">✅ تعمل</div>
+            </div>
+            <div style="text-align:center;background:#fef9e7;border-radius:8px;padding:14px">
+              <div style="font-size:26px;font-weight:700;color:var(--warning)">${vehicles.filter(v=>v.status==='maintenance').length}</div>
+              <div style="font-size:12px;color:var(--text-light)">🔧 صيانة</div>
+            </div>
+            <div style="text-align:center;background:#fdedec;border-radius:8px;padding:14px">
+              <div style="font-size:26px;font-weight:700;color:var(--danger)">${vehicles.filter(v=>v.status==='stopped').length}</div>
+              <div style="font-size:12px;color:var(--text-light)">🔴 متوقفة</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-title">آخر التعبئات</span>
+          ${can('fuel_view')?`<button class="btn btn-sm btn-info" onclick="navigate('fuel')">الكل</button>`:''}</div>
+        <div style="overflow-x:auto">
+          <table>
+            <thead><tr><th>السيارة</th><th>الكمية</th><th>التكلفة</th><th>التاريخ</th></tr></thead>
+            <tbody>
+              ${recentFuel.length===0?`<tr><td colspan="4" class="tbl-empty"><div class="ei">⛽</div><p>لا توجد تعبئات</p></td></tr>`:
+                recentFuel.map(r=>{const v=DB.find('vehicles',r.vehicleId);return`<tr>
+                  <td>${v?esc(v.name):'<em class="text-muted">محذوفة</em>'}</td>
+                  <td>${fmtNum(r.quantity)} لتر</td>
+                  <td>${fmtNum(r.cost)} ر.س</td>
+                  <td>${fmtDate(r.date||r.createdAt)}</td>
+                </tr>`;}).join('')}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>`;
+}
+
+/* ============================================================
+   SETTINGS PAGE
+   ============================================================ */
+function renderSettings(){
+  if(!can('settings_manage')&&!isOwner()){toast('ليس لديك صلاحية','error');navigate('dashboard');return;}
+  const s=getSettings();
+  document.getElementById('topActions').innerHTML=
+    `<button class="btn btn-primary" onclick="saveSettingsForm()">💾 حفظ الإعدادات</button>`;
+  document.getElementById('pageBody').innerHTML=`
+    <div class="card">
+      <div class="card-header"><span class="card-title">⚙️ إعدادات النظام</span></div>
+      <div class="card-body">
+        <div class="form-row">
+          <div class="form-group">
+            <label>اسم الشركة</label>
+            <input class="form-control" id="set_company" value="${esc(s.company_name)}">
+          </div>
+        </div>
+        <hr class="form-divider">
+        <div class="form-section-title">أسعار الوقود (ريال / لتر)</div>
+        <div class="form-row-3">
+          <div class="form-group">
+            <label>ديزل</label>
+            <input class="form-control" type="number" step="0.01" id="set_diesel" value="${s.diesel_price}">
+          </div>
+          <div class="form-group">
+            <label>بنزين 91</label>
+            <input class="form-control" type="number" step="0.01" id="set_p91" value="${s.petrol91_price}">
+          </div>
+          <div class="form-group">
+            <label>بنزين 95</label>
+            <input class="form-control" type="number" step="0.01" id="set_p95" value="${s.petrol95_price}">
+          </div>
+        </div>
+        <hr class="form-divider">
+        <div class="form-section-title">إعدادات التنبيهات</div>
+        <div class="form-row-3">
+          <div class="form-group">
+            <label>التنبيه قبل الانتهاء بـ (يوم)</label>
+            <input class="form-control" type="number" id="set_alert_days" value="${s.alert_days}">
+            <div class="form-hint">للاستمارة والتأمين والصيانة</div>
+          </div>
+          <div class="form-group">
+            <label>تنبيه التانكي عند % من السعة</label>
+            <input class="form-control" type="number" id="set_tank_pct" value="${s.tank_alert_pct}">
+          </div>
+          <div class="form-group">
+            <label>تنبيه عدم التعبئة بعد (يوم)</label>
+            <input class="form-control" type="number" id="set_unfueled" value="${s.unfueled_days}">
+          </div>
+        </div>
+      </div>
+    </div>`;
+}
+
+function saveSettingsForm(){
+  saveSettings({
+    company_name:document.getElementById('set_company').value.trim(),
+    diesel_price:document.getElementById('set_diesel').value,
+    petrol91_price:document.getElementById('set_p91').value,
+    petrol95_price:document.getElementById('set_p95').value,
+    alert_days:document.getElementById('set_alert_days').value,
+    tank_alert_pct:document.getElementById('set_tank_pct').value,
+    unfueled_days:document.getElementById('set_unfueled').value,
+  });
+  document.getElementById('companyName').textContent=getSetting('company_name');
+  toast('تم حفظ الإعدادات بنجاح');
+  logAct('تعديل الإعدادات','');
+}
+
+/* ============================================================
+   ATTACHMENTS HELPER
+   ============================================================ */
+function uploadAttachment(entityType,entityId,onDone){
+  const inp=document.createElement('input');
+  inp.type='file';inp.accept='.pdf,.jpg,.jpeg,.png';
+  inp.onchange=e=>{
+    const file=e.target.files[0];if(!file)return;
+    if(file.size>5*1024*1024){toast('حجم الملف أكبر من 5MB','error');return;}
+    const reader=new FileReader();
+    reader.onload=ev=>{
+      const att=DB.add('attachments',{
+        entityType,entityId,name:file.name,
+        fileType:file.type,data:ev.target.result,
+        size:file.size,userId:currentUser.id,userName:currentUser.name
+      });
+      logAct('رفع مرفق',`${file.name}`);
+      toast('تم رفع الملف بنجاح');
+      if(onDone)onDone(att);
+    };
+    reader.onerror=()=>toast('فشل قراءة الملف','error');
+    reader.readAsDataURL(file);
+  };
+  inp.click();
+}
+
+function renderAttachments(entityType,entityId,canAdd,canDelete){
+  const atts=DB.all('attachments').filter(a=>a.entityType===entityType&&a.entityId===entityId);
+  return`<div>
+    ${canAdd?`<button class="btn btn-sm btn-info" onclick="uploadAttachment('${entityType}','${entityId}',()=>navigate(currentPage))">📎 إرفاق ملف</button>`:''}
+    <div class="att-list mt-2">
+      ${atts.length===0?`<p class="text-muted" style="font-size:13px">لا توجد مرفقات</p>`:
+        atts.map(a=>`<div class="att-item">
+          <span class="att-icon">${fileIcon(a.fileType)}</span>
+          <span class="att-name">${esc(a.name)}</span>
+          <span class="att-size">${fmtFileSize(a.size)}</span>
+          <div class="att-actions">
+            <a href="${a.data}" download="${esc(a.name)}" class="btn btn-sm btn-secondary">⬇️</a>
+            ${canDelete?`<button class="btn btn-sm btn-danger" onclick="deleteAttachment('${a.id}','${entityType}','${entityId}')">🗑️</button>`:''}
+          </div>
+        </div>`).join('')}
+    </div>
+  </div>`;
+}
+
+let currentPage='dashboard';
+function deleteAttachment(id,entityType,entityId){
+  confirm2('حذف هذا المرفق؟',()=>{
+    DB.del('attachments',id);
+    logAct('حذف مرفق','');
+    toast('تم حذف المرفق');
+    const _mo=document.getElementById('modalOverlay').style.display==='flex';
+    if(_mo){document.getElementById('modalBody').innerHTML=renderAttachments(entityType,entityId,can(entityType+'s_add'),can(entityType+'s_delete'));}
+    else navigate(currentPage);
+  });
+}
+
+/* ============================================================
+   DRIVER HELPERS — used throughout the app
+   ============================================================ */
+function getLinkedDriver(){
+  if(!currentUser)return null;
+  return DB.all('drivers').find(d=>d.userId===currentUser.id&&d.status!=='inactive')||null;
+}
+function getDriverVehicleIds(){
+  const d=getLinkedDriver();
+  return d?d.vehicleIds||[]:null;
+}
+function filterByDriverAccess(vehicles){
+  const ids=getDriverVehicleIds();
+  if(ids===null)return vehicles;
+  return vehicles.filter(v=>ids.includes(v.id));
+}
+function isDriverUser(){ return !!getLinkedDriver(); }
+
+/* ============================================================
+   DRIVERS MODULE
+   ============================================================ */
+function renderDrivers(){
+  if(!can('drivers_view')){toast('ليس لديك صلاحية','error');navigate('dashboard');return;}
+  if(can('drivers_add'))document.getElementById('topActions').innerHTML=
+    `<button class="btn btn-primary" onclick="openDriverModal()">+ إضافة سائق</button>`;
+  const drivers=DB.all('drivers');
+  const vehicles=DB.all('vehicles').filter(v=>!v.archived);
+  const users=DB.all('users');
+  document.getElementById('pageBody').innerHTML=`
+    <div class="card">
+      <div class="card-header"><span class="card-title">السائقون (${drivers.length})</span>
+        <input class="f-input" type="search" id="drvS" placeholder="🔍 بحث..." oninput="filterDrivers()" onsearch="filterDrivers()"></div>
+      <div class="tbl-wrap"><table>
+        <thead><tr><th>#</th><th>اسم السائق</th><th>رقم الجوال</th><th>المركبات المخصصة</th><th>حساب النظام</th><th>الحالة</th><th>الإجراءات</th></tr></thead>
+        <tbody id="drvTb">${renderDrvRows(drivers)}</tbody>
+      </table>${drivers.length===0?`<div class="tbl-empty"><div class="ei">👤</div><p>لا يوجد سائقون</p></div>`:''}</div>
+    </div>`;
+}
+function renderDrvRows(list){
+  const vehicles=DB.all('vehicles');const users=DB.all('users');
+  return list.map((d,i)=>{
+    const vNames=(d.vehicleIds||[]).map(vid=>{const v=DB.find('vehicles',vid);return v?`<span class="badge b-info" style="margin:1px">${esc(v.name)}</span>`:null;}).filter(Boolean).join('');
+    const u=d.userId?DB.find('users',d.userId):null;
+    const stBadge=d.status==='inactive'?'<span class="badge b-secondary">غير نشط</span>':'<span class="badge b-success">نشط</span>';
+    return`<tr><td>${i+1}</td>
+      <td><strong>${esc(d.name)}</strong>${d.notes?`<div class="text-muted" style="font-size:11px">${esc(d.notes)}</div>`:''}</td>
+      <td>${esc(d.phone||'-')}</td>
+      <td>${vNames||'<span class="text-muted">لا يوجد</span>'}</td>
+      <td>${u
+        ?`<div><span class="code-tag">${esc(u.username)}</span><br>
+           <button class="btn btn-sm btn-secondary" style="margin-top:4px;font-size:11px" onclick="resetDriverPassword('${u.id}')">🔑 تغيير كلمة المرور</button>
+          </div>`
+        :`<button class="btn btn-sm btn-warning" onclick="openDriverModal('${d.id}')">⚠️ إنشاء حساب</button>`
+      }</td>
+      <td>${stBadge}</td>
+      <td class="tbl-actions">
+        ${can('drivers_edit')?`<button class="btn btn-sm btn-info" onclick="openDriverModal('${d.id}')">✏️</button>`:''}
+        ${can('drivers_delete')?`<button class="btn btn-sm btn-danger" onclick="confirmDelDriver('${d.id}')">🗑️</button>`:''}
+      </td></tr>`;}).join('');
+}
+function filterDrivers(){
+  const q=document.getElementById('drvS').value.toLowerCase();
+  document.getElementById('drvTb').innerHTML=renderDrvRows(DB.all('drivers').filter(d=>d.name.toLowerCase().includes(q)||(d.phone||'').includes(q)));
+}
+function genDriverUsername(name){
+  const base=(name.trim().split(' ')[0]||'driver').slice(0,8);
+  return 'drv_'+base+'_'+Math.random().toString(36).slice(2,6);
+}
+function genDriverPassword(){
+  const c='abcdefghjkmnpqrstuvwxyzABCDEFGHJKMNPQRSTUVWXYZ23456789@#!';
+  return Array.from({length:10},()=>c[Math.floor(Math.random()*c.length)]).join('');
+}
+
+function openDriverModal(id){
+  const d=id?DB.find('drivers',id):null;
+  const vehicles=DB.all('vehicles').filter(v=>!v.archived);
+  const driverVehicles=d?.vehicleIds||[];
+  const linkedUser=d?.userId?DB.find('users',d.userId):null;
+
+  const accountSection=id
+    ? (linkedUser
+        ? `<div style="background:#eafaf1;border-radius:8px;padding:12px;border:1px solid var(--success);margin-bottom:4px">
+            <div style="font-weight:700;color:var(--success);margin-bottom:6px">✅ حساب نشط</div>
+            <div style="font-size:13px">الاسم: <strong>${esc(linkedUser.name)}</strong></div>
+            <div style="font-size:13px;margin-top:4px">اسم الدخول: <code style="background:#f0f2f7;padding:2px 8px;border-radius:4px">${esc(linkedUser.username)}</code></div>
+            <div class="mt-2"><button type="button" class="btn btn-sm btn-warning" onclick="resetDriverPassword('${d.userId}')">🔑 إعادة تعيين كلمة المرور</button></div>
+          </div>`
+        : `<div style="background:#fef9e7;border-radius:8px;padding:10px 12px;border:1px solid var(--warning)">
+            <div style="font-weight:700;color:var(--warning);font-size:13px">⚠️ لا يوجد حساب — سيُنشأ تلقائياً عند الحفظ</div>
+          </div>`)
+    : `<div style="background:#ebf5fb;border-radius:8px;padding:10px 12px;border:1px solid var(--info)">
+        <div style="font-weight:700;color:var(--info);font-size:13px">ℹ️ سيُنشأ حساب دخول تلقائياً وتُعرض بياناته بعد الحفظ</div>
+      </div>`;
+
+  openModal(id?'تعديل السائق':'إضافة سائق جديد',`
+    <div class="form-row">
+      <div class="form-group"><label>اسم السائق <span class="req">*</span></label>
+        <input class="form-control" id="dm_n" value="${d?esc(d.name):''}"></div>
+      <div class="form-group"><label>رقم الجوال</label>
+        <input class="form-control" id="dm_ph" value="${d?esc(d.phone||''):''}"></div>
+    </div>
+    <div class="form-group"><label>الحالة</label>
+      <select class="form-control" id="dm_st">
+        <option value="active"${!d||d.status==='active'?' selected':''}>✅ نشط</option>
+        <option value="inactive"${d&&d.status==='inactive'?' selected':''}>🔴 غير نشط</option>
+      </select></div>
+    <hr class="form-divider">
+    <div class="form-section-title">حساب الدخول</div>
+    ${accountSection}
+    <hr class="form-divider">
+    <div class="form-section-title">المركبات المخصصة</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;max-height:180px;overflow-y:auto;padding:4px">
+      ${vehicles.length===0?'<p class="text-muted">لا توجد مركبات</p>':
+        vehicles.map(v=>`<label class="perm-cb">
+          <input type="checkbox" name="dv_${v.id}" ${driverVehicles.includes(v.id)?'checked':''}>
+          ${esc(v.name)}${v.plate?' ('+esc(v.plate)+')':''}
+        </label>`).join('')}
+    </div>
+    <div class="form-group mt-2"><label>ملاحظات</label>
+      <textarea class="form-control" id="dm_no">${d?esc(d.notes||''):''}</textarea></div>`,
+    'حفظ',()=>saveDriver(id),{wide:true});
+}
+
+async function saveDriver(id){
+  const name=document.getElementById('dm_n').value.trim();
+  if(!name){toast('أدخل اسم السائق','error');return;}
+  const vehicleIds=Array.from(document.querySelectorAll('[name^="dv_"]:checked')).map(cb=>cb.name.replace('dv_',''));
+  const existing=id?DB.find('drivers',id):null;
+  let userId=existing?.userId||null;
+  let plainPassword=null;
+
+  if(!userId){
+    const username=genDriverUsername(name);
+    plainPassword=genDriverPassword();
+    let hashed;
+    try{hashed=await hashPwd(plainPassword);}
+    catch{toast('خطأ في تشفير كلمة المرور — تأكد من استخدام HTTPS','error');return;}
+    const newUser=DB.add('users',{
+      name,username,password:hashed,role:'user',
+      permissions:{vehicles_view:true,fuel_view:true,fuel_add:true,notes_view:true,notes_add:true}
+    });
+    userId=newUser.id;
+    logAct('إنشاء حساب سائق',username);
+  }
+
+  const data={name,phone:document.getElementById('dm_ph').value.trim(),
+    status:document.getElementById('dm_st').value,
+    userId,vehicleIds,notes:document.getElementById('dm_no').value.trim()};
+
+  if(id){DB.update('drivers',id,data);logAct('تعديل سائق',name);}
+  else{DB.add('drivers',data);logAct('إضافة سائق',name);}
+
+  closeModal();
+
+  if(plainPassword){
+    const u=DB.find('users',userId);
+    openModal('✅ تم إنشاء حساب السائق',`
+      <div style="text-align:center;margin-bottom:16px">
+        <div style="font-size:48px">🎉</div>
+        <p style="font-size:15px;font-weight:700;color:var(--primary);margin-top:8px">تم إنشاء الحساب بنجاح!</p>
+        <p style="color:var(--text-light);font-size:13px">سلّم هذه البيانات للسائق</p>
+      </div>
+      <div style="background:#f8fafc;border-radius:10px;padding:20px;border:2px dashed var(--border)">
+        <div style="margin-bottom:14px">
+          <div style="font-size:12px;color:var(--text-light);font-weight:700;margin-bottom:4px">👤 اسم المستخدم</div>
+          <div style="font-size:20px;font-weight:700;color:var(--primary);font-family:monospace;letter-spacing:1px">${esc(u?.username||'')}</div>
+        </div>
+        <div>
+          <div style="font-size:12px;color:var(--text-light);font-weight:700;margin-bottom:4px">🔑 كلمة المرور</div>
+          <div style="font-size:20px;font-weight:700;color:var(--accent);font-family:monospace;letter-spacing:1px">${esc(plainPassword)}</div>
+        </div>
+      </div>
+      <div style="background:#fef9e7;border-radius:8px;padding:10px 14px;margin-top:12px;font-size:13px;color:#b7770d;text-align:center">
+        ⚠️ هذه المعلومات لن تُعرض مرة أخرى — احفظها الآن
+      </div>`,null,null);
+  }
+  renderDrivers();
+}
+
+async function resetDriverPassword(userId){
+  const plain=genDriverPassword();
+  let _hashed;
+  try{_hashed=await hashPwd(plain);}
+  catch{toast('خطأ في تشفير كلمة المرور — تأكد من استخدام HTTPS','error');return;}
+  DB.update('users',userId,{password:_hashed});
+  const u=DB.find('users',userId);
+  logAct('إعادة تعيين كلمة مرور سائق',u?.username||'');
+  closeModal();
+  openModal('🔑 كلمة المرور الجديدة',`
+    <div style="text-align:center">
+      <div style="font-size:42px;margin-bottom:8px">🔑</div>
+      <p style="color:var(--text-light);font-size:13px;margin-bottom:16px">كلمة المرور الجديدة لـ <strong>${esc(u?.name||'')}</strong></p>
+      <div style="background:#f8fafc;border-radius:10px;padding:20px;border:2px dashed var(--border)">
+        <div style="font-size:12px;color:var(--text-light);margin-bottom:6px">👤 ${esc(u?.username||'')}</div>
+        <div style="font-size:22px;font-weight:700;color:var(--accent);font-family:monospace;letter-spacing:2px">${esc(plain)}</div>
+      </div>
+      <div style="background:#fef9e7;border-radius:8px;padding:10px;margin-top:12px;font-size:13px;color:#b7770d">
+        ⚠️ لن تُعرض مرة أخرى — احفظها الآن
+      </div>
+    </div>`,null,null);
+}
+
+function confirmDelDriver(id){
+  const d=DB.find('drivers',id);
+  const linkedUser=d?.userId?DB.find('users',d.userId):null;
+  confirm2(`حذف سائق "${d?.name}"؟${linkedUser?' سيُحذف حسابه ('+linkedUser.username+') أيضاً.':''}`,()=>{
+    if(d?.userId){const u=DB.find('users',d.userId);if(u&&u.role!=='owner')DB.del('users',d.userId);}
+    DB.del('drivers',id);
+    logAct('حذف سائق',d?.name||'');
+    toast('تم حذف السائق وحسابه');
+    renderDrivers();
+  });
+}
+
+/* ============================================================
+   FUEL MOVEMENT LOG — placeholder (يكتمل في الجزء 2)
+   ============================================================ */
+function renderFuelMovement(){
+  if(!can('fuel_movement_view')){toast('ليس لديك صلاحية','error');navigate('dashboard');return;}
+  const movements=DB.all('fuelMovements').sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt));
+  document.getElementById('pageBody').innerHTML=`
+    <div class="card">
+      <div class="card-header"><span class="card-title">📈 سجل حركة الوقود (${movements.length})</span></div>
+      <div class="tbl-wrap"><table>
+        <thead><tr><th>#</th><th>التانكي</th><th>النوع</th><th>اللترات</th><th>الرصيد قبل</th><th>الرصيد بعد</th><th>المستخدم</th><th>التاريخ والوقت</th><th>المصدر</th></tr></thead>
+        <tbody>${movements.length===0?`<tr><td colspan="9" class="tbl-empty"><div class="ei">📈</div><p>لا توجد حركات مسجلة</p></td></tr>`:
+          movements.map((m,i)=>{
+            const tk=DB.find('tanks',m.tankId);
+            const typeLabel=m.type==='fill'?'<span class="badge b-success">إضافة ⬆️</span>':'<span class="badge b-danger">خصم ⬇️</span>';
+            return`<tr><td>${i+1}</td><td>${tk?esc(tk.name):esc(m.tankName||'-')}</td>
+              <td>${typeLabel}</td>
+              <td><strong>${fmtNum(Math.abs(m.liters))}</strong> لتر</td>
+              <td>${fmtNum(m.balanceBefore)} لتر</td>
+              <td><strong>${fmtNum(m.balanceAfter)}</strong> لتر</td>
+              <td>${esc(m.userName||'-')}</td>
+              <td style="font-size:12px;white-space:nowrap">${fmtDateTime(m.createdAt)}</td>
+              <td><span class="badge b-secondary">${esc(m.entityType||'-')}</span></td>
+            </tr>`;}).join('')}
+        </tbody>
+      </table></div>
+    </div>`;
+}
+
+/* ============================================================
+   DRIVER DASHBOARD
+   ============================================================ */
+function renderDriverDashboard(){
+  const driver=getLinkedDriver();
+  if(!driver){navigate('dashboard');return;}
+  const myVehicles=filterByDriverAccess(DB.all('vehicles').filter(v=>!v.archived));
+  const myFuel=DB.all('fuel').filter(f=>myVehicles.some(v=>v.id===f.vehicleId))
+    .sort((a,b)=>new Date(b.date||b.createdAt)-new Date(a.date||a.createdAt));
+  const totalL=myFuel.reduce((s,r)=>s+(parseFloat(r.quantity)||0),0);
+  const totalC=myFuel.reduce((s,r)=>s+(parseFloat(r.cost)||0),0);
+  const pendingMy=myFuel.filter(r=>r.approvalStatus==='pending'||!r.approvalStatus).length;
+  const approvedMy=myFuel.filter(r=>r.approvalStatus==='approved').length;
+
+  document.getElementById('pageBody').innerHTML=`
+    <div style="background:linear-gradient(135deg,var(--primary),var(--primary-light));border-radius:var(--radius);padding:24px 22px;margin-bottom:22px;color:#fff">
+      <div style="font-size:32px;margin-bottom:4px">👋</div>
+      <h2 style="font-size:20px;font-weight:700;margin-bottom:4px">أهلاً، ${esc(driver.name)}</h2>
+      <p style="opacity:.75;font-size:13px">لديك ${myVehicles.length} مركبة مخصصة</p>
+    </div>
+
+    <div class="stat-grid">
+      <div class="stat-card c-blue"><div class="stat-icon">🚛</div><div><div class="stat-val">${myVehicles.length}</div><div class="stat-lbl">مركباتي</div></div></div>
+      <div class="stat-card c-green"><div class="stat-icon">⛽</div><div><div class="stat-val">${myFuel.length}</div><div class="stat-lbl">تعبئاتي</div></div></div>
+      <div class="stat-card c-orange"><div class="stat-icon">📊</div><div><div class="stat-val">${fmtNum(totalL)}</div><div class="stat-lbl">إجمالي اللترات</div></div></div>
+      <div class="stat-card c-purple"><div class="stat-icon">⏳</div><div><div class="stat-val">${pendingMy}</div><div class="stat-lbl">بانتظار الاعتماد</div></div></div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">🚛 مركباتي</span>
+          <button class="btn btn-sm btn-primary" onclick="navigate('fuel')">⛽ تسجيل تعبئة</button>
+        </div>
+        <div class="card-body" style="padding:0">
+          ${myVehicles.length===0
+            ? `<div class="tbl-empty"><div class="ei">🚛</div><p>لا توجد مركبات مخصصة لك</p></div>`
+            : myVehicles.map(v=>{
+                const lastFuel=myFuel.filter(f=>f.vehicleId===v.id)[0];
+                const st=V_ST[v.status]||v.status;
+                const sb=V_SB[v.status]||'b-secondary';
+                return`<div style="display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--border-light)">
+                  <div style="font-size:28px">${v.photo?`<img src="${v.photo}" style="width:44px;height:36px;object-fit:cover;border-radius:6px">`:'🚛'}</div>
+                  <div style="flex:1">
+                    <div style="font-weight:700">${esc(v.name)}</div>
+                    <div style="font-size:12px;color:var(--text-light)">${v.plate?`<code>${esc(v.plate)}</code> — `:''}${esc(v.fuelType||'')}</div>
+                    ${lastFuel?`<div style="font-size:11px;color:var(--text-light);margin-top:2px">آخر تعبئة: ${fmtDate(lastFuel.date||lastFuel.createdAt)} — ${fmtNum(lastFuel.quantity)} لتر</div>`:''}
+                  </div>
+                  <div style="text-align:left">
+                    <span class="badge ${sb}">${st}</span><br>
+                    <button class="btn btn-sm btn-success mt-1" onclick="_fuelVPreset='${v.id}';navigate('fuel')" style="margin-top:6px">⛽</button>
+                  </div>
+                </div>`;}).join('')}
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">⛽ آخر تعبئاتي</span>
+        </div>
+        <div style="overflow-x:auto">
+          <table>
+            <thead><tr><th>التاريخ</th><th>المركبة</th><th>الكمية</th><th>الحالة</th></tr></thead>
+            <tbody>
+              ${myFuel.slice(0,8).length===0
+                ? `<tr><td colspan="4" class="tbl-empty"><p>لا توجد تعبئات بعد</p></td></tr>`
+                : myFuel.slice(0,8).map(r=>{
+                    const v=DB.find('vehicles',r.vehicleId);
+                    const aprvMap={approved:'<span class="badge b-success" style="font-size:11px">✅</span>',rejected:'<span class="badge b-danger" style="font-size:11px">❌</span>',pending:'<span class="badge b-warning" style="font-size:11px">⏳</span>'};
+                    return`<tr>
+                      <td style="font-size:12px">${fmtDate(r.date||r.createdAt)}</td>
+                      <td>${v?esc(v.name):'-'}</td>
+                      <td><strong>${fmtNum(r.quantity)}</strong> لتر</td>
+                      <td>${aprvMap[r.approvalStatus||'pending']||''}</td>
+                    </tr>`;}).join('')}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>`;
+}
+
+/* ============================================================
+   PROJECTS
+   ============================================================ */
+const PRJ_ST={active:'نشط',completed:'مكتمل',suspended:'موقوف'};
+const PRJ_SB={active:'b-success',completed:'b-info',suspended:'b-warning'};
+
+function renderProjects(){
+  if(!can('projects_view')){toast('ليس لديك صلاحية','error');navigate('dashboard');return;}
+  if(can('projects_add'))document.getElementById('topActions').innerHTML=`<button class="btn btn-primary" onclick="openProjectModal()">+ إضافة مشروع</button>`;
+  const projects=DB.all('projects');
+  document.getElementById('pageBody').innerHTML=`
+    <div class="card">
+      <div class="card-header"><span class="card-title">المشاريع (${projects.length})</span>
+        <input class="f-input" type="search" id="prjS" placeholder="🔍 بحث..." oninput="filterProjects()" onsearch="filterProjects()"></div>
+      <div class="tbl-wrap"><table>
+        <thead><tr><th>#</th><th>اسم المشروع</th><th>الموقع</th><th>رقم العقد</th><th>الحالة</th><th>السيارات</th><th>الإجراءات</th></tr></thead>
+        <tbody id="prjTb">${renderPrjRows(projects)}</tbody>
+      </table>${projects.length===0?`<div class="tbl-empty"><div class="ei">🏗️</div><p>لا توجد مشاريع</p></div>`:''}</div>
+    </div>`;
+}
+function renderPrjRows(list){
+  const vehicles=DB.all('vehicles');
+  return list.map((p,i)=>{const cnt=vehicles.filter(v=>v.projectId===p.id).length;
+    return`<tr><td>${i+1}</td>
+      <td><strong>${esc(p.name)}</strong>${p.description?`<div class="text-muted" style="font-size:11px">${esc(p.description)}</div>`:''}</td>
+      <td>${esc(p.location||'-')}</td><td>${esc(p.contractNo||'-')}</td>
+      <td><span class="badge ${PRJ_SB[p.status]||'b-secondary'}">${PRJ_ST[p.status]||p.status||'-'}</span></td>
+      <td><span class="badge b-info">${cnt}</span></td>
+      <td class="tbl-actions">
+        ${can('projects_edit')?`<button class="btn btn-sm btn-info" onclick="openProjectModal('${p.id}')">✏️</button>`:''}
+        ${can('projects_delete')?`<button class="btn btn-sm btn-danger" onclick="confirmDelProject('${p.id}')">🗑️</button>`:''}
+      </td></tr>`;}).join('');
+}
+function filterProjects(){
+  const q=document.getElementById('prjS').value.toLowerCase();
+  document.getElementById('prjTb').innerHTML=renderPrjRows(DB.all('projects').filter(p=>p.name.toLowerCase().includes(q)||(p.location||'').toLowerCase().includes(q)));
+}
+function openProjectModal(id){
+  const p=id?DB.find('projects',id):null;
+  openModal(id?'تعديل مشروع':'إضافة مشروع جديد',`
+    <div class="form-row">
+      <div class="form-group"><label>اسم المشروع <span class="req">*</span></label><input class="form-control" id="pm_n" value="${p?esc(p.name):''}"></div>
+      <div class="form-group"><label>الموقع</label><input class="form-control" id="pm_l" value="${p?esc(p.location||''):''}"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>رقم العقد</label><input class="form-control" id="pm_c" value="${p?esc(p.contractNo||''):''}"></div>
+      <div class="form-group"><label>الحالة</label>
+        <select class="form-control" id="pm_s">
+          <option value="active"${!p||p.status==='active'?' selected':''}>✅ نشط</option>
+          <option value="completed"${p&&p.status==='completed'?' selected':''}>🏁 مكتمل</option>
+          <option value="suspended"${p&&p.status==='suspended'?' selected':''}>⏸ موقوف</option>
+        </select></div>
+    </div>
+    <div class="form-group"><label>الوصف</label><textarea class="form-control" id="pm_d">${p?esc(p.description||''):''}</textarea></div>`,
+    'حفظ',()=>saveProject(id));
+}
+function saveProject(id){
+  if(id?!can('projects_edit'):!can('projects_add')){toast('ليس لديك صلاحية','error');return;}
+  const name=document.getElementById('pm_n').value.trim();
+  if(!name){toast('أدخل اسم المشروع','error');return;}
+  const data={name,location:document.getElementById('pm_l').value.trim(),contractNo:document.getElementById('pm_c').value.trim(),status:document.getElementById('pm_s').value,description:document.getElementById('pm_d').value.trim()};
+  if(id){DB.update('projects',id,data);logAct('تعديل مشروع',name);}else{DB.add('projects',data);logAct('إضافة مشروع',name);}
+  toast(id?'تم التحديث':'تمت الإضافة');closeModal();renderProjects();
+}
+function confirmDelProject(id){
+  const p=DB.find('projects',id);
+  confirm2(`حذف مشروع "${p?.name}"؟`,()=>{DB.del('projects',id);logAct('حذف مشروع',p?.name||'');toast('تم الحذف');renderProjects();});
+}
+
+/* ============================================================
+   GROUPS
+   ============================================================ */
+function renderGroups(){
+  if(!can('groups_view')){toast('ليس لديك صلاحية','error');navigate('dashboard');return;}
+  if(can('groups_add'))document.getElementById('topActions').innerHTML=`<button class="btn btn-primary" onclick="openGroupModal()">+ إضافة مجموعة</button>`;
+  const groups=DB.all('groups');
+  document.getElementById('pageBody').innerHTML=`
+    <div class="card">
+      <div class="card-header"><span class="card-title">المجموعات (${groups.length})</span>
+        <input class="f-input" type="search" id="grpS" placeholder="🔍 بحث..." oninput="filterGroups()" onsearch="filterGroups()"></div>
+      <div class="tbl-wrap"><table>
+        <thead><tr><th>#</th><th>اسم المجموعة</th><th>عدد السيارات</th><th>الإجراءات</th></tr></thead>
+        <tbody id="grpTb">${renderGrpRows(groups)}</tbody>
+      </table>${groups.length===0?`<div class="tbl-empty"><div class="ei">📁</div><p>لا توجد مجموعات</p></div>`:''}</div>
+    </div>`;
+}
+function renderGrpRows(list){
+  const vehicles=DB.all('vehicles');
+  return list.map((g,i)=>{const cnt=vehicles.filter(v=>v.groupId===g.id).length;
+    return`<tr><td>${i+1}</td><td><strong>${esc(g.name)}</strong></td><td><span class="badge b-info">${cnt} سيارة</span></td>
+      <td class="tbl-actions">
+        ${can('groups_edit')?`<button class="btn btn-sm btn-info" onclick="openGroupModal('${g.id}')">✏️</button>`:''}
+        ${can('groups_delete')?`<button class="btn btn-sm btn-danger" onclick="confirmDelGroup('${g.id}')">🗑️</button>`:''}
+      </td></tr>`;}).join('');
+}
+function filterGroups(){
+  const q=document.getElementById('grpS').value.toLowerCase();
+  document.getElementById('grpTb').innerHTML=renderGrpRows(DB.all('groups').filter(g=>g.name.toLowerCase().includes(q)));
+}
+function openGroupModal(id){
+  const g=id?DB.find('groups',id):null;
+  openModal(id?'تعديل المجموعة':'إضافة مجموعة',`
+    <div class="form-group"><label>اسم المجموعة <span class="req">*</span></label>
+      <input class="form-control" id="gm_n" value="${g?esc(g.name):''}"></div>`,
+    'حفظ',()=>saveGroup(id));
+}
+function saveGroup(id){
+  if(id?!can('groups_edit'):!can('groups_add')){toast('ليس لديك صلاحية','error');return;}
+  const name=document.getElementById('gm_n').value.trim();
+  if(!name){toast('أدخل الاسم','error');return;}
+  if(id)DB.update('groups',id,{name});else DB.add('groups',{name});
+  toast(id?'تم التحديث':'تمت الإضافة');closeModal();renderGroups();
+}
+function confirmDelGroup(id){
+  const g=DB.find('groups',id);
+  const cnt=DB.all('vehicles').filter(v=>v.groupId===id).length;
+  if(cnt>0){toast(`لا يمكن الحذف — تحتوي على ${cnt} سيارة`,'error');return;}
+  confirm2(`حذف مجموعة "${g?.name}"؟`,()=>{DB.del('groups',id);toast('تم الحذف');renderGroups();});
+}
+
+/* ============================================================
+   VEHICLES
+   ============================================================ */
+const V_ST={working:'تعمل',maintenance:'صيانة',stopped:'متوقفة'};
+const V_SB={working:'b-success',maintenance:'b-warning',stopped:'b-danger'};
+const FUEL_TYPES=['ديزل','بنزين 91','بنزين 95'];
+let _showArchivedVeh=false;
+function renderVehicles(showArchived=false){
+  _showArchivedVeh=showArchived;
+  if(!can('vehicles_view')){toast('ليس لديك صلاحية','error');navigate('dashboard');return;}
+  document.getElementById('topActions').innerHTML=
+    (can('vehicles_add')?`<button class="btn btn-primary" onclick="openVehicleModal()">+ إضافة سيارة</button> `:'') +
+    `<button class="btn btn-sm ${showArchived?'btn-warning':'btn-secondary'}" onclick="renderVehicles(${!showArchived})">
+      ${showArchived?'🚛 النشطة':'📦 المؤرشفة'}
+    </button>`;
+  const vehicles=DB.all('vehicles').filter(v=>showArchived?v.archived:!v.archived),groups=DB.all('groups'),projects=DB.all('projects');
+  document.getElementById('pageBody').innerHTML=`
+    <div class="card">
+      <div class="card-header"><span class="card-title">السيارات والمعدات (${vehicles.length})</span>
+        <div class="filter-bar">
+          <input class="f-input" type="search" id="vS" placeholder="🔍 بحث..." oninput="filterVehicles()" onsearch="filterVehicles()">
+          <select class="f-select" id="vGF" onchange="filterVehicles()"><option value="">كل المجموعات</option>${groups.map(g=>`<option value="${g.id}">${esc(g.name)}</option>`).join('')}</select>
+          <select class="f-select" id="vPF" onchange="filterVehicles()"><option value="">كل المشاريع</option>${projects.map(p=>`<option value="${p.id}">${esc(p.name)}</option>`).join('')}</select>
+          <select class="f-select" id="vSF" onchange="filterVehicles()"><option value="">كل الحالات</option><option value="working">تعمل</option><option value="maintenance">صيانة</option><option value="stopped">متوقفة</option></select>
+        </div></div>
+      <div class="tbl-wrap"><table>
+        <thead><tr><th></th><th>#</th><th>السيارة</th><th>اللوحة</th><th>المجموعة</th><th>المشروع</th><th>الوقود</th><th>الاستمارة</th><th>التأمين</th><th>الحالة</th><th>الإجراءات</th></tr></thead>
+        <tbody id="vTb">${renderVehRows(vehicles)}</tbody>
+      </table>${vehicles.length===0?`<div class="tbl-empty"><div class="ei">🚛</div><p>لا توجد سيارات</p></div>`:''}</div>
+    </div>`;
+}
+function renderVehRows(list){
+  const groups=DB.all('groups'),projects=DB.all('projects');
+  return list.map((v,i)=>{
+    const g=groups.find(x=>x.id===v.groupId),p=projects.find(x=>x.id===v.projectId);
+    const rd=daysUntil(v.registrationExpiry),id2=daysUntil(v.insuranceExpiry);
+    const rb=v.registrationExpiry?(rd<=0?'<span class="badge b-danger">منتهية</span>':rd<=30?`<span class="badge b-warning">${rd}ي</span>`:`<span class="badge b-success">${fmtDate(v.registrationExpiry)}</span>`):'<span class="text-muted">-</span>';
+    const ib=v.insuranceExpiry?(id2<=0?'<span class="badge b-danger">منتهي</span>':id2<=30?`<span class="badge b-warning">${id2}ي</span>`:`<span class="badge b-success">${fmtDate(v.insuranceExpiry)}</span>`):'<span class="text-muted">-</span>';
+    return`<tr>
+      <td>${v.photo?`<img src="${v.photo}" class="vehicle-photo" alt="">`:'<span style="font-size:22px">🚛</span>'}</td>
+      <td>${i+1}</td>
+      <td><strong>${esc(v.name)}</strong>${v.chassisNumber?`<div class="text-muted" style="font-size:11px">هيكل: ${esc(v.chassisNumber)}</div>`:''}</td>
+      <td><span class="code-tag">${esc(v.plate||'-')}</span></td>
+      <td>${g?esc(g.name):'-'}</td><td>${p?esc(p.name):'-'}</td><td>${esc(v.fuelType||'-')}</td>
+      <td>${rb}</td><td>${ib}</td>
+      <td><span class="badge ${V_SB[v.status]||'b-secondary'}">${V_ST[v.status]||v.status}</span></td>
+      <td class="tbl-actions">
+        ${!v.archived&&can('vehicles_edit')?`<button class="btn btn-sm btn-info" onclick="openVehicleModal('${v.id}')">✏️</button>`:''}
+        ${!v.archived&&can('fuel_add')?`<button class="btn btn-sm btn-success" onclick="openFuelModal(null,'${v.id}')">⛽</button>`:''}
+        ${!v.archived&&can('vehicles_delete')?`<button class="btn btn-sm btn-warning" onclick="archiveVehicle('${v.id}')" title="أرشفة">📦 أرشفة</button>`:''}
+        ${v.archived&&can('vehicles_edit')?`<button class="btn btn-sm btn-success" onclick="restoreVehicle('${v.id}')">♻️ استعادة</button>`:''}
+        ${v.archived&&isOwner()?`<button class="btn btn-sm btn-danger" onclick="confirmDelVehicle('${v.id}')">🗑️</button>`:''}
+      </td></tr>`;}).join('');
+}
+function filterVehicles(){
+  const q=(document.getElementById('vS').value||'').toLowerCase();
+  const gf=document.getElementById('vGF').value,pf=document.getElementById('vPF').value,sf=document.getElementById('vSF').value;
+  let v=DB.all('vehicles').filter(x=>!!x.archived===_showArchivedVeh);
+  if(q)v=v.filter(x=>x.name.toLowerCase().includes(q)||(x.plate||'').toLowerCase().includes(q)||(x.chassisNumber||'').toLowerCase().includes(q));
+  if(gf)v=v.filter(x=>x.groupId===gf);if(pf)v=v.filter(x=>x.projectId===pf);if(sf)v=v.filter(x=>x.status===sf);
+  document.getElementById('vTb').innerHTML=renderVehRows(v);
+}
+function openVehicleModal(id){
+  const v=id?DB.find('vehicles',id):null;
+  const groups=DB.all('groups'),projects=DB.all('projects');
+  openModal(id?'تعديل السيارة':'إضافة سيارة جديدة',`
+    <div class="form-section-title">البيانات الأساسية</div>
+    <div class="form-row">
+      <div class="form-group"><label>اسم السيارة <span class="req">*</span></label><input class="form-control" id="vm_n" value="${v?esc(v.name):''}"></div>
+      <div class="form-group"><label>رقم اللوحة</label><input class="form-control" id="vm_p" value="${v?esc(v.plate||''):''}"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>المجموعة</label>
+        <select class="form-control" id="vm_g"><option value="">--</option>${groups.map(g=>`<option value="${g.id}"${v&&v.groupId===g.id?' selected':''}>${esc(g.name)}</option>`).join('')}</select></div>
+      <div class="form-group"><label>المشروع</label>
+        <select class="form-control" id="vm_pr"><option value="">--</option>${projects.map(p=>`<option value="${p.id}"${v&&v.projectId===p.id?' selected':''}>${esc(p.name)}</option>`).join('')}</select></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>نوع الوقود</label>
+        <select class="form-control" id="vm_f">${FUEL_TYPES.map(f=>`<option${v&&v.fuelType===f?' selected':''}>${f}</option>`).join('')}</select></div>
+      <div class="form-group"><label>الحالة</label>
+        <select class="form-control" id="vm_s">
+          <option value="working"${!v||v.status==='working'?' selected':''}>✅ تعمل</option>
+          <option value="maintenance"${v&&v.status==='maintenance'?' selected':''}>🔧 صيانة</option>
+          <option value="stopped"${v&&v.status==='stopped'?' selected':''}>🔴 متوقفة</option>
+        </select></div>
+    </div>
+    <div class="form-group"><label>مصدر التعبئة المسموح به</label>
+      <select class="form-control" id="vm_fs">
+        <option value="both"${!v||!v.fuelSource||v.fuelSource==='both'?' selected':''}>🔄 التانكي والمحطات (كلاهما)</option>
+        <option value="tank"${v&&v.fuelSource==='tank'?' selected':''}>🛢️ من التانكي فقط</option>
+        <option value="station"${v&&v.fuelSource==='station'?' selected':''}>⛽ من المحطات فقط</option>
+      </select>
+      <div class="form-hint">يحدد مصادر الوقود المسموح بها عند تسجيل التعبئة</div>
+    </div>
+    <div style="display:none">
+    </div>
+    <hr class="form-divider">
+    <div class="form-section-title">بيانات التسجيل والتأمين</div>
+    <div class="form-row">
+      <div class="form-group"><label>رقم الهيكل</label><input class="form-control" id="vm_ch" value="${v?esc(v.chassisNumber||''):''}"></div>
+      <div class="form-group"><label>رقم الاستمارة</label><input class="form-control" id="vm_rn" value="${v?esc(v.registrationNumber||''):''}"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>تاريخ انتهاء الاستمارة</label><input class="form-control" type="date" id="vm_re" value="${v?v.registrationExpiry||'':''}"></div>
+      <div class="form-group"><label>شركة التأمين</label><input class="form-control" id="vm_ic" value="${v?esc(v.insuranceCompany||''):''}"></div>
+    </div>
+    <div class="form-group"><label>تاريخ انتهاء التأمين</label><input class="form-control" type="date" id="vm_ie" value="${v?v.insuranceExpiry||'':''}"></div>
+    <hr class="form-divider">
+    <div class="form-section-title">صورة المركبة (JPG/PNG — حد أقصى 2MB)</div>
+    <div class="form-group">
+      <div class="upload-area" onclick="document.getElementById('vm_pi').click()">📷 اضغط لاختيار صورة</div>
+      <input type="file" id="vm_pi" accept=".jpg,.jpeg,.png" style="display:none" onchange="prevVehPhoto(event)">
+      <img id="vm_pp" class="photo-preview${v&&v.photo?' show':''}" src="${v&&v.photo?v.photo:'#'}">
+    </div>`,
+    'حفظ',()=>saveVehicle(id),{wide:true});
+}
+function prevVehPhoto(e){
+  const file=e.target.files[0];if(!file)return;
+  if(file.size>2*1024*1024){toast('الصورة أكبر من 2MB','error');return;}
+  const r=new FileReader();r.onload=ev=>{const img=document.getElementById('vm_pp');img.src=ev.target.result;img.classList.add('show');};r.onerror=()=>toast('فشل قراءة الصورة','error');r.readAsDataURL(file);
+}
+function saveVehicle(id){
+  if(id?!can('vehicles_edit'):!can('vehicles_add')){toast('ليس لديك صلاحية','error');return;}
+  const name=document.getElementById('vm_n').value.trim();
+  if(!name){toast('أدخل اسم السيارة','error');return;}
+  const pp=document.getElementById('vm_pp');
+  const data={name,plate:document.getElementById('vm_p').value.trim(),groupId:document.getElementById('vm_g').value||null,projectId:document.getElementById('vm_pr').value||null,
+    fuelType:document.getElementById('vm_f').value,status:document.getElementById('vm_s').value,
+    fuelSource:document.getElementById('vm_fs').value,
+    chassisNumber:document.getElementById('vm_ch').value.trim(),registrationNumber:document.getElementById('vm_rn').value.trim(),
+    registrationExpiry:document.getElementById('vm_re').value||null,insuranceCompany:document.getElementById('vm_ic').value.trim(),
+    insuranceExpiry:document.getElementById('vm_ie').value||null};
+  if(pp.src&&pp.src.startsWith('data:'))data.photo=pp.src;
+  else if(id){const ex=DB.find('vehicles',id);if(ex?.photo)data.photo=ex.photo;}
+  if(id){DB.update('vehicles',id,data);logAct('تعديل سيارة',name);}else{DB.add('vehicles',data);logAct('إضافة سيارة',name);}
+  toast(id?'تم التحديث':'تمت الإضافة');closeModal();renderVehicles();
+}
+function archiveVehicle(id){
+  const v=DB.find('vehicles',id);
+  confirm2(`أرشفة "${v?.name}"؟ ستختفي من القوائم النشطة مع الحفاظ على جميع سجلاتها.`,()=>{
+    DB.update('vehicles',id,{archived:true,archivedAt:new Date().toISOString()});
+    logAct('أرشفة سيارة',v?.name||'');
+    toast('تم أرشفة السيارة — يمكن استعادتها من قسم المؤرشفة');
+    renderVehicles();
+  });
+}
+function restoreVehicle(id){
+  const v=DB.find('vehicles',id);
+  DB.update('vehicles',id,{archived:false,archivedAt:null});
+  logAct('استعادة سيارة',v?.name||'');
+  toast('تمت استعادة السيارة');
+  renderVehicles(true);
+}
+function confirmDelVehicle(id){
+  const v=DB.find('vehicles',id);
+  confirm2(`⚠️ حذف نهائي لـ "${v?.name}"؟ لا يمكن التراجع — ستُحذف جميع السجلات المرتبطة.`,()=>{
+    DB.del('vehicles',id);
+    DB.set('fuel',DB.all('fuel').filter(r=>r.vehicleId!==id));
+    DB.set('maintenance',DB.all('maintenance').filter(r=>r.vehicleId!==id));
+    DB.set('notes',DB.all('notes').filter(r=>r.vehicleId!==id));
+    DB.set('attachments',DB.all('attachments').filter(r=>!(r.entityType==='vehicle'&&r.entityId===id)));
+    // Remove from drivers
+    const drivers=DB.all('drivers');
+    drivers.forEach(d=>{if(d.vehicleIds?.includes(id)){DB.update('drivers',d.id,{vehicleIds:d.vehicleIds.filter(x=>x!==id)});}});
+    logAct('حذف سيارة نهائي',v?.name||'');toast('تم الحذف النهائي للسيارة');renderVehicles(true);
+  });
+}
+
+/* ============================================================
+   TANKS
+   ============================================================ */
+function renderTanks(){
+  if(!can('tanks_view')){toast('ليس لديك صلاحية','error');navigate('dashboard');return;}
+  if(can('tanks_add'))document.getElementById('topActions').innerHTML=`<button class="btn btn-primary" onclick="openTankModal()">+ إضافة تانكي</button>`;
+  const tanks=DB.all('tanks');
+  const fills=DB.all('tankFills').sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt)).slice(0,20);
+  document.getElementById('pageBody').innerHTML=`
+    <div class="tanks-grid">${renderTankCards(tanks)}</div>
+    <div class="card">
+      <div class="card-header"><span class="card-title">🛢️ التانكيات (${tanks.length})</span></div>
+      <div class="tbl-wrap"><table>
+        <thead><tr><th>#</th><th>الاسم</th><th>نوع الوقود</th><th>السعة</th><th>الكمية الحالية</th><th>المتبقي للامتلاء</th><th>النسبة</th><th>الإجراءات</th></tr></thead>
+        <tbody>${tanks.length===0?`<tr><td colspan="8" class="tbl-empty"><div class="ei">🛢️</div><p>لا توجد تانكيات</p></td></tr>`:
+          tanks.map((tk,i)=>{const pct=tk.capacity>0?Math.min(100,Math.round(tk.currentLevel/tk.capacity*100)):0;const bc=pct>50?'b-success':pct>20?'b-warning':'b-danger';
+            return`<tr><td>${i+1}</td><td><strong>${esc(tk.name)}</strong></td><td>${esc(tk.fuelType)}</td>
+              <td>${fmtNum(tk.capacity)} لتر</td><td><strong>${fmtNum(tk.currentLevel)}</strong> لتر</td>
+              <td>${fmtNum(tk.capacity-tk.currentLevel)} لتر</td><td><span class="badge ${bc}">${pct}%</span></td>
+              <td class="tbl-actions">
+                ${can('tanks_edit')?`<button class="btn btn-sm btn-success" onclick="openTankFillModal('${tk.id}')">➕ تعبئة</button>`:''}
+                ${can('tanks_edit')?`<button class="btn btn-sm btn-info" onclick="openTankModal('${tk.id}')">✏️</button>`:''}
+                ${can('tanks_delete')?`<button class="btn btn-sm btn-danger" onclick="confirmDelTank('${tk.id}')">🗑️</button>`:''}
+              </td></tr>`;}).join('')}
+        </tbody>
+      </table></div>
+    </div>
+    <div class="card">
+      <div class="card-header"><span class="card-title">📋 سجل تعبئات التانكيات (آخر 20)</span></div>
+      <div class="tbl-wrap"><table>
+        <thead><tr><th>#</th><th>التانكي</th><th>الكمية المضافة</th><th>التاريخ</th><th>السعر/لتر</th><th>التكلفة</th><th>ملاحظات</th></tr></thead>
+        <tbody>${fills.length===0?`<tr><td colspan="7" class="tbl-empty"><p>لا توجد سجلات</p></td></tr>`:
+          fills.map((f,i)=>{const tk=DB.find('tanks',f.tankId);return`<tr><td>${i+1}</td><td>${tk?esc(tk.name):'-'}</td><td><strong>${fmtNum(f.liters)}</strong> لتر</td><td>${fmtDate(f.date||f.createdAt)}</td><td>${f.pricePerLiter?fmtNum(f.pricePerLiter)+' ر.س':'-'}</td><td>${f.totalCost?fmtNum(f.totalCost)+' ر.س':'-'}</td><td>${esc(f.notes||'-')}</td></tr>`;}).join('')}
+        </tbody>
+      </table></div>
+    </div>`;
+}
+function renderTankCards(tanks){
+  return tanks.map(tk=>{const pct=tk.capacity>0?Math.min(100,Math.round(tk.currentLevel/tk.capacity*100)):0;const cls=pct>50?'tf-green':pct>20?'tf-yellow':'tf-red';
+    return`<div class="tank-card"><div class="tank-name">${esc(tk.name)}</div><div class="tank-type">${esc(tk.fuelType)}</div>
+      <div class="tank-nums"><span>الحالي: <strong>${fmtNum(tk.currentLevel)} لتر</strong></span><span>السعة: ${fmtNum(tk.capacity)}</span></div>
+      <div class="tank-bar"><div class="tank-fill ${cls}" style="width:${pct}%"></div></div>
+      <div class="tank-pct" style="color:${pct>50?'var(--success)':pct>20?'var(--warning)':'var(--danger)'}">${pct}% ممتلئ — متبقٍ للامتلاء: ${fmtNum(tk.capacity-tk.currentLevel)} لتر</div>
+    </div>`;}).join('');
+}
+function openTankModal(id){
+  const tk=id?DB.find('tanks',id):null;
+  openModal(id?'تعديل التانكي':'إضافة تانكي جديد',`
+    <div class="form-row">
+      <div class="form-group"><label>الاسم <span class="req">*</span></label><input class="form-control" id="tkn" value="${tk?esc(tk.name):''}"></div>
+      <div class="form-group"><label>نوع الوقود</label>
+        <select class="form-control" id="tkf">${FUEL_TYPES.map(f=>`<option${tk&&tk.fuelType===f?' selected':''}>${f}</option>`).join('')}</select></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>السعة الكاملة (لتر)</label><input class="form-control" type="number" id="tkc" value="${tk?tk.capacity:''}" min="0"></div>
+      <div class="form-group"><label>الكمية الحالية (لتر)</label><input class="form-control" type="number" id="tkcur" value="${tk?tk.currentLevel:0}" min="0"></div>
+    </div>
+    <div class="form-group"><label>حد التنبيه (%)</label><input class="form-control" type="number" id="tka" value="${tk?tk.alertPct||20:20}" min="0" max="100"></div>`,
+    'حفظ',()=>saveTank(id));
+}
+function saveTank(id){
+  if(id?!can('tanks_edit'):!can('tanks_add')){toast('ليس لديك صلاحية','error');return;}
+  const name=document.getElementById('tkn').value.trim();if(!name){toast('أدخل الاسم','error');return;}
+  const cap=parseFloat(document.getElementById('tkc').value)||0,cur=parseFloat(document.getElementById('tkcur').value)||0;
+  if(cur>cap){toast('الكمية الحالية لا تتجاوز السعة','error');return;}
+  const data={name,fuelType:document.getElementById('tkf').value,capacity:cap,currentLevel:cur,alertPct:parseInt(document.getElementById('tka').value,10)||20};
+  if(id)DB.update('tanks',id,data);else DB.add('tanks',data);
+  toast(id?'تم التحديث':'تمت الإضافة');closeModal();renderTanks();
+}
+function openTankFillModal(tankId){
+  const tk=DB.find('tanks',tankId);if(!tk)return;
+  const pct=tk.capacity>0?Math.min(100,Math.round(tk.currentLevel/tk.capacity*100)):0;
+  const cls=pct>50?'tf-green':pct>20?'tf-yellow':'tf-red';
+  openModal(`تعبئة تانكي: ${esc(tk.name)}`,`
+    <div style="background:#f8fafc;border-radius:8px;padding:12px;margin-bottom:14px">
+      <div style="font-size:13px">الكمية الحالية: <strong>${fmtNum(tk.currentLevel)}</strong> من <strong>${fmtNum(tk.capacity)} لتر</strong></div>
+      <div class="tank-bar mt-1"><div class="tank-fill ${cls}" style="width:${pct}%"></div></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>الكمية المضافة (لتر) <span class="req">*</span></label>
+        <input class="form-control" type="number" id="tfl" min="0.01" step="0.01" oninput="chkTankFill(${tk.capacity},${tk.currentLevel});calcTankCost()">
+        <div class="form-hint">المساحة المتبقية: <strong>${fmtNum(tk.capacity-tk.currentLevel)}</strong> لتر</div>
+        <div class="form-hint" id="tfcost"></div></div>
+      <div class="form-group"><label>التاريخ</label><input class="form-control" type="date" id="tfd" value="${today()}"></div>
+    </div>
+    <div class="form-group"><label>سعر الليتر (ر.س)</label>
+      <input class="form-control" type="number" id="tfp" min="0" step="0.01" placeholder="مثال: 0.75" oninput="calcTankCost()">
+      <div class="form-hint">اتركه فارغاً لاستخدام سعر النظام</div></div>
+    <div id="tfw" style="display:none;color:var(--danger);font-size:13px;margin-bottom:8px"></div>
+    <div class="form-group"><label>ملاحظات</label><textarea class="form-control" id="tfn"></textarea></div>`,
+    'تأكيد',()=>saveTankFill(tankId));
+}
+function chkTankFill(cap,cur){
+  const l=parseFloat(document.getElementById('tfl').value)||0,w=document.getElementById('tfw');
+  if(cur+l>cap){w.style.display='block';w.textContent=`⚠️ ستتجاوز السعة (${fmtNum(cap)} لتر)`;} else w.style.display='none';
+}
+function calcTankCost(){
+  const l=parseFloat(document.getElementById('tfl')?.value)||0;
+  const p=parseFloat(document.getElementById('tfp')?.value)||0;
+  const el=document.getElementById('tfcost');
+  if(el&&l>0&&p>0)el.textContent=`التكلفة الإجمالية: ${fmtNum((l*p).toFixed(2))} ر.س`;
+  else if(el)el.textContent='';
+}
+function saveTankFill(tankId){
+  if(!can('tanks_edit')&&!isOwner()){toast('ليس لديك صلاحية','error');return;}
+  const liters=parseFloat(document.getElementById('tfl').value)||0;
+  if(liters<=0){toast('أدخل كمية صحيحة','error');return;}
+  if(!document.getElementById('tfd').value){toast('أدخل التاريخ','error');return;}
+  const tk=DB.find('tanks',tankId);
+  if(liters>tk.capacity-tk.currentLevel){toast(`الكمية (${liters}L) تتجاوز السعة المتبقية (${fmtNum(tk.capacity-tk.currentLevel)}L)`,'error');return;}
+  const balanceBefore=tk.currentLevel;
+  const newLevel=Math.min(tk.capacity,tk.currentLevel+liters);
+  DB.update('tanks',tankId,{currentLevel:newLevel});
+  const fill=DB.add('tankFills',{tankId,liters,date:document.getElementById('tfd').value,notes:document.getElementById('tfn').value.trim(),
+    pricePerLiter:parseFloat(document.getElementById('tfp').value)||null,
+    totalCost:parseFloat(document.getElementById('tfp').value)&&parseFloat(document.getElementById('tfl').value)
+      ?(parseFloat(document.getElementById('tfl').value)*parseFloat(document.getElementById('tfp').value)).toFixed(2)
+      :null,
+    userId:currentUser.id,userName:currentUser.name});
+  logFuelMovement(tankId,'fill',liters,balanceBefore,newLevel,'tank_fill',fill.id);
+  logAct('تعبئة تانكي',`${tk.name} +${liters}L → ${fmtNum(newLevel)}L`);
+  toast(`✅ رصيد التانكي الجديد: ${fmtNum(newLevel)} لتر`);closeModal();renderTanks();
+}
+function confirmDelTank(id){
+  const tk=DB.find('tanks',id);
+  confirm2(`حذف تانكي "${tk?.name}"؟`,()=>{DB.del('tanks',id);toast('تم الحذف');renderTanks();});
+}
+
+/* ============================================================
+   FUEL RECORDS
+   ============================================================ */
+let _fuelVPreset='';
+function openFuelModal(id,vehicleIdPreset){
+  if(vehicleIdPreset)_fuelVPreset=vehicleIdPreset;
+  const r=id?DB.find('fuel',id):null;
+  const allVeh=DB.all('vehicles').filter(v=>!v.archived);
+  const driverVeh=filterByDriverAccess(allVeh);
+  const tanks=DB.all('tanks'),projects=DB.all('projects');
+  const sv=r?r.vehicleId:(_fuelVPreset||'');
+  const svo=DB.find('vehicles',sv);
+  const fuelSrc=svo?.fuelSource||'both';
+  const matchTanks=tanks.filter(tk=>!svo||tk.fuelType===svo.fuelType);
+  function buildTankOpts(selId){
+    let o='';
+    if(fuelSrc!=='tank')o+=`<option value="">⛽ من المحطة (خارجي)</option>`;
+    if(fuelSrc!=='station')o+=matchTanks.map(tk=>`<option value="${tk.id}"${selId===tk.id?' selected':''}>🛢️ ${esc(tk.name)} — ${fmtNum(tk.currentLevel)} لتر</option>`).join('');
+    return o;
+  }
+  const lastOdo=svo?DB.all('fuel').filter(f=>f.vehicleId===svo.id&&f.odometer).sort((a,b)=>new Date(b.date||b.createdAt)-new Date(a.date||a.createdAt))[0]?.odometer:null;
+  const nowTime=`${String(new Date().getHours()).padStart(2,'0')}:${String(new Date().getMinutes()).padStart(2,'0')}`;
+  const _vFuelRecs=svo?DB.all('fuel').filter(f=>f.vehicleId===svo.id).sort((a,b)=>new Date(b.date||b.createdAt)-new Date(a.date||a.createdAt)):[];
+  const lastFuelRec=_vFuelRecs[0]||null;
+  const lastFillHint=lastFuelRec?`آخر تعبئة لهذه السيارة: <strong>${fmtNum(lastFuelRec.quantity)}</strong> لتر`:'';
+  const lastTankId=!id&&svo?(_vFuelRecs.find(f=>f.tankId)?.tankId||''):'';
+  const srcColors={tank:'#eafaf1',station:'#fef3e7',both:'#ebf5fb'};
+  const srcLabels={tank:'🛢️ هذه المركبة تُعبَّأ من التانكي فقط',station:'⛽ من المحطات الخارجية فقط',both:'🔄 مسموح: التانكي أو المحطة'};
+  openModal(id?'تعديل سجل التعبئة':'تسجيل تعبئة جديدة',`
+    <div class="form-group"><label>السيارة <span class="req">*</span></label>
+      <select class="form-control" id="fm_v" onchange="onFuelVehCh()">
+        <option value="">-- اختر سيارة --</option>
+        ${driverVeh.map(v=>`<option value="${v.id}"${sv===v.id?' selected':''}>${esc(v.name)}${v.plate?' ('+v.plate+')':''} — ${v.fuelType}</option>`).join('')}
+      </select></div>
+    <div id="fm_src_badge" style="font-size:12px;padding:7px 12px;border-radius:6px;margin-bottom:10px;background:${srcColors[fuelSrc]};display:${svo?'block':'none'}">
+      ${srcLabels[fuelSrc]||''}
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>المصدر</label>
+        <select class="form-control" id="fm_tk" onchange="onFuelTkCh()">${buildTankOpts(r?r.tankId||'':lastTankId)}</select></div>
+      <div class="form-group"><label>التاريخ <span class="req">*</span></label>
+        <input class="form-control" type="date" id="fm_d" value="${r?r.date||today():today()}"></div>
+      <div class="form-group"><label>وقت التعبئة</label>
+        <input class="form-control" type="time" id="fm_t" value="${r?r.fillTime||'':nowTime}"></div>
+    </div>
+    <div id="fm_tki" style="display:none;background:#f8fafc;border-radius:7px;padding:9px;margin-bottom:10px;font-size:13px"></div>
+    <div class="form-row">
+      <div class="form-group"><label>الكمية (لتر) <span class="req">*</span></label>
+        <input class="form-control" type="number" id="fm_q" value="${r?r.quantity:''}" min="0.01" step="0.01" oninput="calcFuelCost()">
+        <div class="form-hint" id="fm_last_fill_hint">${lastFillHint}</div></div>
+      <div class="form-group"><label>التكلفة (ر.س) — محسوبة تلقائياً</label>
+        <input class="form-control" type="number" id="fm_c" value="${r?r.cost:''}" readonly style="background:#f0f2f7">
+        <div class="form-hint" id="fm_ph">${r&&r.pricePerLiter?`سعر مسجل: ${r.pricePerLiter} ر.س/لتر`:''}</div></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>قراءة العداد (كم)</label>
+        <input class="form-control" type="number" id="fm_odo" value="${r?r.odometer||'':''}" min="0" placeholder="مثال: 125000">
+        <div class="form-hint">${lastOdo?`آخر قراءة: ${fmtNum(lastOdo)} كم`:'لا توجد قراءة سابقة'}</div></div>
+      <div class="form-group"><label>المشروع</label>
+        <select class="form-control" id="fm_pr">
+          <option value="">-- بدون مشروع --</option>
+          ${projects.map(p=>`<option value="${p.id}"${r&&r.projectId===p.id?' selected':''}>${esc(p.name)}</option>`).join('')}
+        </select></div>
+    </div>
+    <div class="form-group"><label>ملاحظات</label>
+      <textarea class="form-control" id="fm_n">${r?esc(r.notes||''):''}</textarea></div>`,
+    'حفظ',()=>saveFuelRec(id));
+  setTimeout(()=>{calcFuelCost();onFuelTkCh();},80);
+}
+function onFuelVehCh(){
+  const v=DB.find('vehicles',document.getElementById('fm_v').value);
+  const tanks=DB.all('tanks');
+  const fuelSrc=v?.fuelSource||'both';
+  const mt=v?tanks.filter(tk=>tk.fuelType===v.fuelType):tanks;
+  const sel=document.getElementById('fm_tk');
+  let opts='';
+  if(fuelSrc!=='tank')opts+=`<option value="">⛽ من المحطة (خارجي)</option>`;
+  if(fuelSrc!=='station')opts+=mt.map(tk=>`<option value="${tk.id}">🛢️ ${esc(tk.name)} — ${fmtNum(tk.currentLevel)} لتر</option>`).join('');
+  sel.innerHTML=opts;
+  // Auto-select last tank used for this vehicle
+  if(v){
+    const lastTkId=DB.all('fuel').filter(f=>f.vehicleId===v.id&&f.tankId).sort((a,b)=>new Date(b.date||b.createdAt)-new Date(a.date||a.createdAt))[0]?.tankId;
+    if(lastTkId&&sel.querySelector(`option[value="${lastTkId}"]`))sel.value=lastTkId;
+  }
+  const badge=document.getElementById('fm_src_badge');
+  if(badge){
+    const srcColors={tank:'#eafaf1',station:'#fef3e7',both:'#ebf5fb'};
+    const srcLabels={tank:'🛢️ هذه المركبة تُعبَّأ من التانكي فقط',station:'⛽ من المحطات الخارجية فقط',both:'🔄 مسموح: التانكي أو المحطة'};
+    badge.style.background=srcColors[fuelSrc]||'#ebf5fb';
+    badge.textContent=v?srcLabels[fuelSrc]||'':'';
+    badge.style.display=v?'block':'none';
+  }
+  if(v){
+    const vRecs=DB.all('fuel').filter(f=>f.vehicleId===v.id).sort((a,b)=>new Date(b.date||b.createdAt)-new Date(a.date||a.createdAt));
+    const lastOdo=vRecs.find(f=>f.odometer)?.odometer;
+    const hint=document.querySelector('#fm_odo+.form-hint');
+    if(hint)hint.textContent=lastOdo?`آخر قراءة: ${fmtNum(lastOdo)} كم`:'لا توجد قراءة سابقة';
+    // Update last fill hint
+    const lastFillEl=document.getElementById('fm_last_fill_hint');
+    if(lastFillEl){
+      const lf=vRecs[0];
+      lastFillEl.innerHTML=lf?`آخر تعبئة لهذه السيارة: <strong>${fmtNum(lf.quantity)}</strong> لتر`:'';
+    }
+  } else {
+    const lastFillEl=document.getElementById('fm_last_fill_hint');
+    if(lastFillEl)lastFillEl.innerHTML='';
+  }
+  calcFuelCost();
+  onFuelTkCh();
+}
+function onFuelTkCh(){
+  const tkId=document.getElementById('fm_tk').value,info=document.getElementById('fm_tki');
+  if(!tkId){info.style.display='none';return;}
+  const tk=DB.find('tanks',tkId);if(!tk){info.style.display='none';return;}
+  const pct=tk.capacity>0?Math.round((tk.currentLevel/tk.capacity)*100):0;
+  const cls=pct>50?'tf-green':pct>20?'tf-yellow':'tf-red';
+  info.style.display='block';
+  info.innerHTML=`🛢️ <strong>${esc(tk.name)}</strong> — الرصيد: <strong style="color:${pct>20?'var(--success)':'var(--danger)'}">${fmtNum(tk.currentLevel)} لتر</strong> (${pct}%)`;
+}
+function calcFuelCost(){
+  const v=DB.find('vehicles',document.getElementById('fm_v')?.value);
+  const qty=parseFloat(document.getElementById('fm_q')?.value)||0;
+  const costEl=document.getElementById('fm_c'),hint=document.getElementById('fm_ph');
+  if(!v||qty<=0){if(costEl)costEl.value='';if(hint)hint.textContent='';return;}
+  const price=fuelPrice(v.fuelType);const cost=(qty*price).toFixed(2);
+  if(costEl)costEl.value=cost;
+  if(hint)hint.textContent=`سعر اللتر الحالي: ${price} ر.س × ${qty} لتر = ${cost} ر.س`;
+}
+function saveFuelRec(id){
+  const vehicleId=document.getElementById('fm_v').value;
+  const date=document.getElementById('fm_d').value;
+  const qty=parseFloat(document.getElementById('fm_q').value)||0;
+  const cost=parseFloat(document.getElementById('fm_c').value)||0;
+  const tankId=document.getElementById('fm_tk').value;
+  if(!vehicleId){toast('اختر السيارة','error');return;}
+  if(!date){toast('اختر التاريخ','error');return;}
+  if(qty<=0){toast('أدخل كمية صحيحة','error');return;}
+  if(tankId){
+    const tk=DB.find('tanks',tankId);
+    if(tk&&qty>tk.currentLevel){toast(`الكمية (${qty}L) أكبر من رصيد التانكي (${fmtNum(tk.currentLevel)}L)`,'error');return;}
+  }
+  // Historical price: keep original when editing, save current when adding
+  const existingRec=id?DB.find('fuel',id):null;
+  const v=DB.find('vehicles',vehicleId);
+  const pricePerLiter=existingRec?.pricePerLiter||fuelPrice(v?.fuelType||'ديزل');
+  // Odometer + distance
+  const _odoRaw=document.getElementById('fm_odo').value.trim();
+  const odometer=_odoRaw===''?null:parseInt(_odoRaw,10)||null;
+  let distance=null,prevOdometer=null;
+  if(odometer&&!id){
+    const lastRec=DB.all('fuel').filter(f=>f.vehicleId===vehicleId&&f.odometer).sort((a,b)=>new Date(b.date||b.createdAt)-new Date(a.date||a.createdAt))[0];
+    if(lastRec?.odometer){prevOdometer=lastRec.odometer;distance=odometer-prevOdometer;}
+  } else if(id&&existingRec){prevOdometer=existingRec.prevOdometer;distance=existingRec.distance;}
+  const data={vehicleId,date,quantity:qty,cost,pricePerLiter,tankId:tankId||null,
+    projectId:document.getElementById('fm_pr').value||null,
+    fillTime:document.getElementById('fm_t').value||null,
+    odometer,prevOdometer,distance,
+    approvalStatus:'pending',
+    ...(id&&existingRec?.approvedBy?{approvedBy:null,approvedByName:null,approvedAt:null}:{}),
+    notes:document.getElementById('fm_n').value.trim(),userId:currentUser.id,userName:currentUser.name};
+  if(id){
+    // Restore old tank balance + log
+    const old=DB.find('fuel',id);
+    if(old?.tankId){
+      const otk=DB.find('tanks',old.tankId);
+      if(otk){const restored=Math.min(otk.capacity,otk.currentLevel+old.quantity);
+        logFuelMovement(old.tankId,'fill',old.quantity,otk.currentLevel,restored,'edit_restore',id);
+        DB.update('tanks',old.tankId,{currentLevel:restored});}
+    }
+    DB.update('fuel',id,data);
+    // Re-deduct from new tank
+    if(tankId){const tk=DB.find('tanks',tankId);if(tk){const b=tk.currentLevel,a=Math.max(0,tk.currentLevel-qty);DB.update('tanks',tankId,{currentLevel:a});logFuelMovement(tankId,'consume',qty,b,a,'vehicle_fuel_edit',id);}}
+    logAct('تعديل تعبئة',`${v?.name||''} ${qty}L`);
+    toast('تم التحديث');
+  } else {
+    const newRec=DB.add('fuel',data);
+    // Deduct from tank + log movement
+    if(tankId){const tk=DB.find('tanks',tankId);if(tk){const b=tk.currentLevel,a=Math.max(0,tk.currentLevel-qty);DB.update('tanks',tankId,{currentLevel:a});logFuelMovement(tankId,'consume',qty,b,a,'vehicle_fuel',newRec.id);}}
+    logAct('إضافة تعبئة',`${v?.name||''} ${qty}L`);
+    toast('تمت إضافة التعبئة');
+  }
+  _fuelVPreset='';closeModal();renderFuel();
+}
+let _currentFuelRows=[];
+function renderFuel(){
+  const _sf={vf:document.getElementById('fvf')?.value||'',pf:document.getElementById('fpf')?.value||'',df:document.getElementById('fdf')?.value||'',tf:document.getElementById('ftf')?.value||''};
+  if(!can('fuel_view')){toast('ليس لديك صلاحية','error');navigate('dashboard');return;}
+  const driverVehIds=getDriverVehicleIds(); // null = not a driver; array = driver's vehicle IDs
+  const allFuelPending=DB.all('fuel').filter(r=>!r.approvalStatus||r.approvalStatus==='pending');
+  const pendingCount=driverVehIds
+    ? allFuelPending.filter(r=>driverVehIds.includes(r.vehicleId)).length
+    : allFuelPending.length;
+  document.getElementById('topActions').innerHTML=
+    (can('fuel_add')?`<button class="btn btn-primary" onclick="openFuelModal()">+ إضافة تعبئة</button> `:'') +
+    (!driverVehIds&&(can('fuel_approve')||isOwner())?`<button class="btn btn-warning" onclick="renderFuelApproval()">✅ اعتماد التعبئات ${pendingCount>0?`<span style="background:rgba(0,0,0,.2);border-radius:20px;padding:1px 8px">${pendingCount}</span>`:''}</button> `:'') +
+    (driverVehIds?`<button class="btn btn-warning" onclick="renderDriverFuelApproval()">✅ اعتماد تعبئاتي ${pendingCount>0?`<span style="background:rgba(0,0,0,.2);border-radius:20px;padding:1px 8px">${pendingCount}</span>`:''}</button> `:'') +
+    (!driverVehIds&&(can('fuel_view')||can('reports_export_excel'))?`<button class="btn btn-secondary" onclick="exportFuelExcel()">📥 تصدير Excel</button> `:'') +
+    (!driverVehIds&&can('fuel_add')?`<button class="btn btn-secondary" onclick="importFuelExcel()">📤 استيراد Excel</button> <button class="btn btn-sm btn-secondary" onclick="downloadImportTemplate('fuel')" title="تحميل قالب الاستيراد">📋</button>`:'');
+  const allVehicles=DB.all('vehicles').filter(v=>!v.archived);
+  const vehicles=driverVehIds?allVehicles.filter(v=>driverVehIds.includes(v.id)):allVehicles;
+  const projects=DB.all('projects');
+  let fuelData=DB.all('fuel').sort((a,b)=>new Date(b.date||b.createdAt)-new Date(a.date||a.createdAt));
+  if(driverVehIds) fuelData=fuelData.filter(r=>driverVehIds.includes(r.vehicleId));
+  _currentFuelRows=fuelData;
+  const tQ=fuelData.reduce((s,r)=>s+(parseFloat(r.quantity)||0),0);
+  const tC=fuelData.reduce((s,r)=>s+(parseFloat(r.cost)||0),0);
+  document.getElementById('pageBody').innerHTML=`
+    <div class="card">
+      <div class="card-header"><span class="card-title">سجل المحروقات (${fuelData.length})${driverVehIds?'<span class="badge b-info" style="margin-right:8px;font-size:11px">🚗 سياراتك فقط</span>':''}</span>
+        <div class="filter-bar">
+          <select class="f-select" id="fvf" onchange="filterFuel()"><option value="">${driverVehIds?'كل سياراتي':'كل السيارات'}</option>${vehicles.map(v=>`<option value="${v.id}">${esc(v.name)}</option>`).join('')}</select>
+          ${!driverVehIds?`<select class="f-select" id="fpf" onchange="filterFuel()"><option value="">كل المشاريع</option>${projects.map(p=>`<option value="${p.id}">${esc(p.name)}</option>`).join('')}</select>`:'<select class="f-select" id="fpf" style="display:none"></select>'}
+          <input class="f-input" type="date" id="fdf" onchange="filterFuel()">
+          <input class="f-input" type="date" id="ftf" onchange="filterFuel()">
+        </div></div>
+      <div id="fuelSum" style="display:flex;gap:24px;padding:9px 18px;background:#f8fafc;border-bottom:1px solid var(--border);font-size:13px;flex-wrap:wrap">
+        <span>⛽ الكمية: <strong>${fmtNum(tQ)} لتر</strong></span>
+        <span>💰 التكلفة: <strong>${fmtNum(tC)} ر.س</strong></span>
+        <span>📋 العمليات: <strong>${fuelData.length}</strong></span>
+      </div>
+      <div class="tbl-wrap"><table>
+        <thead><tr><th>#</th><th>التاريخ</th><th>السيارة</th><th>المشروع</th><th>المصدر</th><th>الكمية</th><th>سعر/لتر</th><th>التكلفة</th><th>العداد</th><th>المسافة</th><th>الإجراءات</th></tr></thead>
+        <tbody id="fuelTb">${renderFuelRows(fuelData)}</tbody>
+      </table></div>
+    </div>`;
+  if(_sf.vf)document.getElementById('fvf').value=_sf.vf;
+  if(_sf.pf)document.getElementById('fpf').value=_sf.pf;
+  if(_sf.df)document.getElementById('fdf').value=_sf.df;
+  if(_sf.tf)document.getElementById('ftf').value=_sf.tf;
+  if(Object.values(_sf).some(Boolean))filterFuel();
+}
+function renderFuelRows(rows){
+  if(!rows.length)return`<tr><td colspan="11" class="tbl-empty"><div class="ei">⛽</div><p>لا توجد سجلات</p></td></tr>`;
+  return rows.map((r,i)=>{
+    const v=DB.find('vehicles',r.vehicleId),p=DB.find('projects',r.projectId),tk=r.tankId?DB.find('tanks',r.tankId):null;
+    const odoCell=r.odometer?`<span style="font-size:12px;font-weight:600">${fmtNum(r.odometer)}<br><span class="text-muted">كم</span></span>`:'<span class="text-muted">-</span>';
+    const distCell=r.distance!=null?(r.distance>=0?`<span class="text-success" style="font-weight:700;font-size:12px">+${fmtNum(r.distance)} كم</span>`:`<span class="text-danger" style="font-size:12px">${fmtNum(r.distance)} كم</span>`):'<span class="text-muted">-</span>';
+    const aprvMap={approved:'<span class="badge b-success" style="font-size:11px">✅ معتمدة</span>',rejected:'<span class="badge b-danger" style="font-size:11px">❌ مرفوضة</span>',pending:'<span class="badge b-warning" style="font-size:11px">⏳ انتظار</span>'};
+    const aprvBadge=r.approvalStatus?aprvMap[r.approvalStatus]||'':'';
+    return`<tr style="${r.approvalStatus==='rejected'?'opacity:0.6':''}"><td>${i+1}</td><td style="white-space:nowrap">${fmtDate(r.date||r.createdAt)}${r.fillTime?`<br><span style="font-size:11px;color:var(--text-light)">🕐 ${r.fillTime}</span>`:''}${aprvBadge?'<br>'+aprvBadge:''}</td>
+      <td>${v?esc(v.name):'<em class="text-muted">-</em>'}</td>
+      <td>${p?esc(p.name):'-'}</td>
+      <td>${tk?`<span class="badge b-info">${esc(tk.name)}</span>`:'<span class="text-muted">خارجي</span>'}</td>
+      <td><strong>${fmtNum(r.quantity)}</strong> لتر</td>
+      <td><span class="text-muted" style="font-size:12px">${r.pricePerLiter?r.pricePerLiter+' ر.س':'-'}</span></td>
+      <td><strong>${fmtNum(r.cost)}</strong> ر.س</td>
+      <td>${odoCell}</td><td>${distCell}</td>
+      <td class="tbl-actions">
+        ${can('fuel_edit')?`<button class="btn btn-sm btn-info" onclick="openFuelModal('${r.id}')">✏️</button>`:''}
+        ${can('fuel_delete')?`<button class="btn btn-sm btn-danger" onclick="confirmDelFuel('${r.id}')">🗑️</button>`:''}
+      </td></tr>`;}).join('');
+}
+function filterFuel(){
+  const vf=document.getElementById('fvf').value,pf=document.getElementById('fpf')?.value||'';
+  const df=document.getElementById('fdf').value,tf=document.getElementById('ftf').value;
+  let rows=DB.all('fuel').sort((a,b)=>new Date(b.date||b.createdAt)-new Date(a.date||a.createdAt));
+  const driverVehIds=getDriverVehicleIds();
+  if(driverVehIds) rows=rows.filter(r=>driverVehIds.includes(r.vehicleId));
+  if(vf)rows=rows.filter(r=>r.vehicleId===vf);if(pf)rows=rows.filter(r=>r.projectId===pf);
+  if(df)rows=rows.filter(r=>(r.date||r.createdAt.slice(0,10))>=df);
+  if(tf)rows=rows.filter(r=>(r.date||r.createdAt.slice(0,10))<=tf);
+  _currentFuelRows=rows;
+  document.getElementById('fuelTb').innerHTML=renderFuelRows(rows);
+  document.querySelector('.card-title').textContent=`سجل المحروقات (${rows.length})`;
+  const tQ=rows.reduce((s,r)=>s+(parseFloat(r.quantity)||0),0),tC=rows.reduce((s,r)=>s+(parseFloat(r.cost)||0),0);
+  document.getElementById('fuelSum').innerHTML=`<span>⛽ الكمية: <strong>${fmtNum(tQ)} لتر</strong></span><span>💰 التكلفة: <strong>${fmtNum(tC)} ر.س</strong></span><span>📋 العمليات: <strong>${rows.length}</strong></span>`;
+}
+function confirmDelFuel(id){
+  confirm2('حذف هذا السجل؟',()=>{
+    const r=DB.find('fuel',id);
+    if(r?.tankId){
+      const tk=DB.find('tanks',r.tankId);
+      if(tk){
+        const restored=Math.min(tk.capacity,tk.currentLevel+r.quantity);
+        logFuelMovement(r.tankId,'fill',r.quantity,tk.currentLevel,restored,'delete_restore',id);
+        DB.update('tanks',r.tankId,{currentLevel:restored});
+      }
+    }
+    DB.del('fuel',id);logAct('حذف تعبئة',DB.find('vehicles',r?.vehicleId)?.name||'');toast('تم الحذف');renderFuel();
+  });
+}
+
+/* ============================================================
+   DRIVER FUEL APPROVAL — driver sees & approves only their vehicles
+   ============================================================ */
+function renderDriverFuelApproval(){
+  const driver=getLinkedDriver();
+  if(!driver){toast('ليس لديك صلاحية','error');return;}
+  const vehIds=driver.vehicleIds||[];
+  const pending=DB.all('fuel')
+    .filter(r=>(r.approvalStatus==='pending'||!r.approvalStatus)&&vehIds.includes(r.vehicleId))
+    .sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt));
+  if(!pending.length){toast('لا توجد تعبئات بانتظار اعتمادك','info');return;}
+  openModal(`اعتماد تعبئاتي — ${pending.length} بانتظار`,`
+    <div style="max-height:420px;overflow-y:auto">
+      ${pending.map(r=>{
+        const v=DB.find('vehicles',r.vehicleId),p=DB.find('projects',r.projectId);
+        return`<div style="border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:10px">
+          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+            <div>
+              <strong>${v?esc(v.name):'مركبة'}</strong>
+              <span class="text-muted" style="font-size:12px"> — ${fmtDate(r.date||r.createdAt)}${r.fillTime?` — 🕐 ${r.fillTime}`:''}</span><br>
+              <span style="font-size:13px">${fmtNum(r.quantity)} لتر — <strong>${fmtNum(r.cost)} ر.س</strong>${p?' — '+esc(p.name):''}</span>
+              ${r.odometer?`<br><span class="text-muted" style="font-size:12px">عداد: ${fmtNum(r.odometer)} كم</span>`:''}
+              <br><span class="text-muted" style="font-size:11px">بواسطة: ${esc(r.userName||'-')}</span>
+            </div>
+            <div class="tbl-actions">
+              <button class="btn btn-sm btn-success" onclick="driverApproveFuel('${r.id}')">✅ اعتماد</button>
+              <button class="btn btn-sm btn-danger" onclick="driverRejectFuel('${r.id}')">❌ رفض</button>
+            </div>
+          </div>
+        </div>`;}).join('')}
+    </div>`,null,null);
+}
+function driverApproveFuel(id){
+  const driver=getLinkedDriver();
+  const r=DB.find('fuel',id);
+  if(!driver||!driver.vehicleIds?.includes(r?.vehicleId)){toast('ليس لديك صلاحية على هذه المركبة','error');return;}
+  DB.update('fuel',id,{approvalStatus:'approved',approvedBy:currentUser.id,approvedByName:currentUser.name,approvedAt:new Date().toISOString()});
+  const v=DB.find('vehicles',r?.vehicleId);
+  logAct('اعتماد تعبئة (سائق)',v?.name||'');
+  toast(`✅ تم اعتماد تعبئة: ${esc(v?.name||'')}`,`success`);
+  closeModal();
+  const remaining=DB.all('fuel').filter(f=>(f.approvalStatus==='pending'||!f.approvalStatus)&&driver.vehicleIds.includes(f.vehicleId));
+  if(remaining.length)renderDriverFuelApproval();else{toast('تم اعتماد جميع تعبئاتك','info');renderFuel();}
+}
+function driverRejectFuel(id){
+  const driver=getLinkedDriver();
+  const r=DB.find('fuel',id);
+  if(!driver||!driver.vehicleIds?.includes(r?.vehicleId)){toast('ليس لديك صلاحية على هذه المركبة','error');return;}
+  const reason=prompt('سبب الرفض (اختياري):');
+  if(r?.tankId){
+    const tk=DB.find('tanks',r.tankId);
+    if(tk){const restored=Math.min(tk.capacity,tk.currentLevel+(parseFloat(r.quantity)||0));
+      DB.update('tanks',r.tankId,{currentLevel:restored});
+      logFuelMovement(r.tankId,'fill',r.quantity,tk.currentLevel,restored,'driver_reject_restore',id);}
+  }
+  DB.update('fuel',id,{approvalStatus:'rejected',rejectedBy:currentUser.id,rejectedByName:currentUser.name,rejectedAt:new Date().toISOString(),rejectionReason:reason||''});
+  const v=DB.find('vehicles',r?.vehicleId);
+  logAct('رفض تعبئة (سائق)',v?.name||'');
+  toast(`❌ تم رفض التعبئة`,`warning`);
+  closeModal();
+  const remaining=DB.all('fuel').filter(f=>(f.approvalStatus==='pending'||!f.approvalStatus)&&driver.vehicleIds.includes(f.vehicleId));
+  if(remaining.length)renderDriverFuelApproval();else{toast('انتهت قائمة الانتظار','info');renderFuel();}
+}
+
+/* ============================================================
+   FUEL APPROVAL SYSTEM
+   ============================================================ */
+function renderFuelApproval(){
+  if(!can('fuel_approve')&&!isOwner()){toast('ليس لديك صلاحية الاعتماد','error');return;}
+  const pending=DB.all('fuel').filter(r=>!r.approvalStatus||r.approvalStatus==='pending').sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt));
+  if(!pending.length){toast('لا توجد تعبئات بانتظار الاعتماد','info');return;}
+  openModal(`اعتماد التعبئات — ${pending.length} بانتظار`,`
+    <div style="max-height:400px;overflow-y:auto">
+      ${pending.map(r=>{
+        const v=DB.find('vehicles',r.vehicleId),p=DB.find('projects',r.projectId);
+        return`<div style="border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:10px">
+          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+            <div>
+              <strong>${v?esc(v.name):'مركبة محذوفة'}</strong>
+              <span class="text-muted" style="font-size:12px"> — ${fmtDate(r.date||r.createdAt)}${r.fillTime?` — 🕐 ${r.fillTime}`:''}</span><br>
+              <span style="font-size:13px">${fmtNum(r.quantity)} لتر — <strong>${fmtNum(r.cost)} ر.س</strong>${p?' — '+esc(p.name):''}</span>
+              ${r.odometer?`<br><span class="text-muted" style="font-size:12px">عداد: ${fmtNum(r.odometer)} كم${r.distance!=null?` (${r.distance>=0?'+':''}${fmtNum(r.distance)} كم)`:''}</span>`:''}
+              <br><span class="text-muted" style="font-size:11px">بواسطة: ${esc(r.userName||'-')}</span>
+            </div>
+            <div class="tbl-actions">
+              <button class="btn btn-sm btn-success" onclick="approveFuel('${r.id}')">✅ اعتماد</button>
+              <button class="btn btn-sm btn-danger" onclick="rejectFuel('${r.id}')">❌ رفض</button>
+            </div>
+          </div>
+        </div>`;}).join('')}
+    </div>`,null,null);
+}
+
+function approveFuel(id){
+  DB.update('fuel',id,{approvalStatus:'approved',approvedBy:currentUser.id,approvedByName:currentUser.name,approvedAt:new Date().toISOString()});
+  const r=DB.find('fuel',id);const v=DB.find('vehicles',r?.vehicleId);
+  logAct('اعتماد تعبئة',v?.name||'');
+  toast(`✅ تم اعتماد تعبئة: ${esc(v?.name||'')}`,`success`);
+  closeModal();
+  const _rem=DB.all('fuel').filter(r=>!r.approvalStatus||r.approvalStatus==='pending');
+  if(_rem.length)renderFuelApproval();else{toast('تم اعتماد جميع التعبئات','info');renderFuel();}
+}
+
+function rejectFuel(id){
+  const reason=prompt('سبب الرفض (اختياري):');
+  const r=DB.find('fuel',id);
+  if(r?.tankId){
+    const tk=DB.find('tanks',r.tankId);
+    if(tk){const restored=Math.min(tk.capacity,tk.currentLevel+(parseFloat(r.quantity)||0));
+      DB.update('tanks',r.tankId,{currentLevel:restored});
+      logFuelMovement(r.tankId,'fill',r.quantity,tk.currentLevel,restored,'reject_restore',id);}
+  }
+  DB.update('fuel',id,{approvalStatus:'rejected',rejectedBy:currentUser.id,rejectedByName:currentUser.name,rejectedAt:new Date().toISOString(),rejectionReason:reason||''});
+  const v=DB.find('vehicles',r?.vehicleId);
+  logAct('رفض تعبئة',v?.name||'');
+  toast(`❌ تم رفض تعبئة: ${esc(v?.name||'')}`,`warning`);
+  closeModal();
+  const _rem=DB.all('fuel').filter(r=>!r.approvalStatus||r.approvalStatus==='pending');
+  if(_rem.length)renderFuelApproval();else{toast('تم اعتماد جميع التعبئات','info');renderFuel();}
+}
+
+/* ============================================================
+   MAINTENANCE
+   ============================================================ */
+const MAINT_TYPES=['تغيير زيت','تغيير إطارات','تغيير فلاتر','صيانة دورية','إصلاح','فحص دوري','تغيير بطارية','أخرى'];
+
+let _currentMaintRows=[];
+function renderMaintenance(){
+  if(!can('maintenance_view')){toast('ليس لديك صلاحية','error');navigate('dashboard');return;}
+  document.getElementById('topActions').innerHTML=
+    (can('maintenance_add')?`<button class="btn btn-primary" onclick="openMaintModal()">+ إضافة صيانة</button> `:'') +
+    (can('maintenance_view')||can('reports_export_excel')?`<button class="btn btn-secondary" onclick="exportMaintExcel()">📥 تصدير Excel</button> `:'') +
+    (can('maintenance_add')?`<button class="btn btn-secondary" onclick="importMaintExcel()">📤 استيراد Excel</button> <button class="btn btn-sm btn-secondary" onclick="downloadImportTemplate('maintenance')" title="تحميل قالب الاستيراد">📋</button>`:'');
+  const vehicles=DB.all('vehicles').filter(v=>!v.archived),projects=DB.all('projects');
+  const rows=DB.all('maintenance').sort((a,b)=>new Date(b.date||b.createdAt)-new Date(a.date||a.createdAt));
+  _currentMaintRows=rows;
+  const tC=rows.reduce((s,r)=>s+(parseFloat(r.cost)||0),0);
+  document.getElementById('pageBody').innerHTML=`
+    <div class="card">
+      <div class="card-header"><span class="card-title">سجل الصيانة (${rows.length})</span>
+        <div class="filter-bar">
+          <select class="f-select" id="mvf" onchange="filterMaint()"><option value="">كل السيارات</option>${vehicles.map(v=>`<option value="${v.id}">${esc(v.name)}</option>`).join('')}</select>
+          <select class="f-select" id="mpf" onchange="filterMaint()"><option value="">كل المشاريع</option>${projects.map(p=>`<option value="${p.id}">${esc(p.name)}</option>`).join('')}</select>
+          <input class="f-input" type="date" id="mdf" onchange="filterMaint()">
+          <input class="f-input" type="date" id="mtf" onchange="filterMaint()">
+        </div></div>
+      <div style="padding:9px 18px;background:#f8fafc;border-bottom:1px solid var(--border);font-size:13px">
+        💰 إجمالي التكاليف: <strong>${fmtNum(tC)} ر.س</strong> — 📋 السجلات: <strong>${rows.length}</strong>
+      </div>
+      <div class="tbl-wrap"><table>
+        <thead><tr><th>#</th><th>السيارة</th><th>النوع</th><th>المشروع</th><th>التكلفة</th><th>تاريخ الصيانة</th><th>الصيانة القادمة</th><th>الورشة</th><th>الإجراءات</th></tr></thead>
+        <tbody id="maintTb">${renderMaintRows(rows)}</tbody>
+      </table></div>
+    </div>`;
+}
+function renderMaintRows(rows){
+  if(!rows.length)return`<tr><td colspan="9" class="tbl-empty"><div class="ei">🔧</div><p>لا توجد سجلات</p></td></tr>`;
+  return rows.map((m,i)=>{
+    const v=DB.find('vehicles',m.vehicleId),p=DB.find('projects',m.projectId);
+    const nd=m.nextDate?daysUntil(m.nextDate):null;
+    const nb=m.nextDate?(nd<=0?'<span class="badge b-danger">منتهي</span>':nd<=30?`<span class="badge b-warning">${nd} يوم</span>`:`<span class="badge b-success">${fmtDate(m.nextDate)}</span>`):'<span class="text-muted">-</span>';
+    return`<tr><td>${i+1}</td><td>${v?esc(v.name):'-'}</td>
+      <td><span class="badge b-secondary">${esc(m.type||'-')}</span></td>
+      <td>${p?esc(p.name):'-'}</td>
+      <td><strong>${fmtNum(m.cost)}</strong> ر.س</td>
+      <td>${fmtDate(m.date||m.createdAt)}</td><td>${nb}</td><td>${esc(m.workshop||'-')}</td>
+      <td class="tbl-actions">
+        ${can('maintenance_edit')?`<button class="btn btn-sm btn-info" onclick="openMaintModal('${m.id}')">✏️</button>`:''}
+        ${can('maintenance_delete')?`<button class="btn btn-sm btn-danger" onclick="confirmDelMaint('${m.id}')">🗑️</button>`:''}
+      </td></tr>`;}).join('');
+}
+function filterMaint(){
+  const vf=document.getElementById('mvf').value,pf=document.getElementById('mpf').value;
+  const df=document.getElementById('mdf').value,tf=document.getElementById('mtf').value;
+  let rows=DB.all('maintenance').sort((a,b)=>new Date(b.date||b.createdAt)-new Date(a.date||a.createdAt));
+  if(vf)rows=rows.filter(r=>r.vehicleId===vf);if(pf)rows=rows.filter(r=>r.projectId===pf);
+  if(df)rows=rows.filter(r=>(r.date||r.createdAt.slice(0,10))>=df);
+  if(tf)rows=rows.filter(r=>(r.date||r.createdAt.slice(0,10))<=tf);
+  _currentMaintRows=rows;
+  document.getElementById('maintTb').innerHTML=renderMaintRows(rows);
+}
+function openMaintModal(id){
+  const m=id?DB.find('maintenance',id):null;
+  const vehicles=DB.all('vehicles').filter(v=>!v.archived),projects=DB.all('projects');
+  const workshops=[...new Set(DB.all('maintenance').map(mx=>mx.workshop).filter(Boolean))];
+  const curW=m?m.workshop||'':'';
+  const isOtherW=curW&&!workshops.includes(curW);
+  openModal(id?'تعديل سجل الصيانة':'إضافة صيانة جديدة',`
+    <div class="form-row">
+      <div class="form-group"><label>السيارة <span class="req">*</span></label>
+        <select class="form-control" id="mm_v" onchange="updateMaintCostHint()">
+          <option value="">-- اختر --</option>
+          ${vehicles.map(v=>`<option value="${v.id}"${m&&m.vehicleId===v.id?' selected':''}>${esc(v.name)}${v.plate?' ('+v.plate+')':''}</option>`).join('')}
+        </select></div>
+      <div class="form-group"><label>نوع الصيانة</label>
+        <select class="form-control" id="mm_t" onchange="updateMaintCostHint()">${MAINT_TYPES.map(t=>`<option${m&&m.type===t?' selected':''}>${t}</option>`).join('')}</select></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>تاريخ الصيانة</label><input class="form-control" type="date" id="mm_d" value="${m?m.date||today():today()}"></div>
+      <div class="form-group"><label>تاريخ الصيانة القادمة</label><input class="form-control" type="date" id="mm_nd" value="${m?m.nextDate||'':''}"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>التكلفة (ر.س)</label>
+        <input class="form-control" type="number" id="mm_c" value="${m?m.cost:''}" min="0" step="0.01">
+        <div class="form-hint" id="mm_cost_hint"></div></div>
+      <div class="form-group"><label>الورشة</label>
+        <select class="form-control" id="mm_ws" onchange="onMaintWorkshopCh()">
+          <option value="">-- اختر ورشة --</option>
+          ${workshops.map(w=>`<option value="${esc(w)}"${curW===w&&!isOtherW?' selected':''}>${esc(w)}</option>`).join('')}
+          <option value="__other__"${isOtherW?' selected':''}>أخرى - اكتب</option>
+        </select>
+        <input class="form-control" id="mm_w" placeholder="اكتب اسم الورشة" style="margin-top:6px;display:${isOtherW||!workshops.length?'block':'none'}" value="${isOtherW?esc(curW):''}">
+      </div>
+    </div>
+    <div class="form-group"><label>المشروع</label>
+      <select class="form-control" id="mm_p"><option value="">--</option>${projects.map(p=>`<option value="${p.id}"${m&&m.projectId===p.id?' selected':''}>${esc(p.name)}</option>`).join('')}</select></div>
+    <div class="form-group"><label>الوصف</label><textarea class="form-control" id="mm_desc">${m?esc(m.description||''):''}</textarea></div>
+    <div class="form-group"><label>ملاحظات</label><textarea class="form-control" id="mm_n">${m?esc(m.notes||''):''}</textarea></div>`,
+    'حفظ',()=>saveMaint(id),{wide:true});
+  setTimeout(()=>updateMaintCostHint(),80);
+}
+function onMaintWorkshopCh(){
+  const ws=document.getElementById('mm_ws'),wi=document.getElementById('mm_w');
+  if(!ws||!wi)return;
+  wi.style.display=ws.value==='__other__'||!ws.value?'block':'none';
+  if(ws.value!=='__other__')wi.value='';
+}
+function updateMaintCostHint(){
+  const vId=document.getElementById('mm_v')?.value;
+  const mType=document.getElementById('mm_t')?.value;
+  const hint=document.getElementById('mm_cost_hint');
+  if(!hint)return;
+  if(!vId||!mType){hint.textContent='';return;}
+  const recs=DB.all('maintenance').filter(r=>r.vehicleId===vId&&r.type===mType&&r.cost>0);
+  if(!recs.length){hint.textContent='';return;}
+  const avg=recs.reduce((s,r)=>s+(parseFloat(r.cost)||0),0)/recs.length;
+  hint.innerHTML=`متوسط تكلفة ${esc(mType)} لهذه السيارة: <strong>${fmtNum(avg.toFixed(0))} ر.س</strong> (${recs.length} عملية)`;
+}
+function saveMaint(id){
+  if(id?!can('maintenance_edit'):!can('maintenance_add')){toast('ليس لديك صلاحية','error');return;}
+  const vehicleId=document.getElementById('mm_v').value;
+  if(!vehicleId){toast('اختر السيارة','error');return;}
+  const data={vehicleId,type:document.getElementById('mm_t').value,date:document.getElementById('mm_d').value,
+    nextDate:document.getElementById('mm_nd').value||null,cost:parseFloat(document.getElementById('mm_c').value)||0,
+    workshop:(()=>{const ws=document.getElementById('mm_ws'),wi=document.getElementById('mm_w');return ws&&(ws.value==='__other__'||!ws.value)?wi.value.trim():ws?.value||wi?.value||'';})(),projectId:document.getElementById('mm_p').value||null,
+    description:document.getElementById('mm_desc').value.trim(),notes:document.getElementById('mm_n').value.trim(),
+    userId:currentUser.id,userName:currentUser.name};
+  if(!data.date){toast('أدخل تاريخ الصيانة','error');return;}
+  const vn=DB.find('vehicles',vehicleId)?.name||'';
+  if(id){DB.update('maintenance',id,data);logAct('تعديل صيانة',vn);}else{DB.add('maintenance',data);logAct('إضافة صيانة',vn);}
+  toast(id?'تم التحديث':'تمت الإضافة');closeModal();renderMaintenance();
+}
+function confirmDelMaint(id){
+  const m=DB.find('maintenance',id);
+  confirm2('حذف هذا السجل؟',()=>{DB.del('maintenance',id);logAct('حذف صيانة',DB.find('vehicles',m?.vehicleId)?.name||'');toast('تم الحذف');renderMaintenance();});
+}
+
+/* ============================================================
+   EXCEL EXPORT — FUEL
+   ============================================================ */
+function exportFuelExcel(){
+  if(!can('fuel_view')&&!can('reports_export_excel')){toast('ليس لديك صلاحية','error');return;}
+  const rows=_currentFuelRows;
+  if(!rows.length){toast('لا توجد بيانات للتصدير','error');return;}
+  const hdrs=['التاريخ','الوقت','السيارة','المصدر','الكمية (لتر)','التكلفة (ر.س)','العداد (كم)','المشروع','الحالة'];
+  const data=rows.map(r=>{
+    const v=DB.find('vehicles',r.vehicleId),p=DB.find('projects',r.projectId),tk=r.tankId?DB.find('tanks',r.tankId):null;
+    const statusMap={approved:'معتمدة',rejected:'مرفوضة',pending:'انتظار'};
+    return[r.date||r.createdAt.slice(0,10),r.fillTime||'',v?v.name:'',tk?tk.name:'خارجي',parseFloat(r.quantity)||0,parseFloat(r.cost)||0,r.odometer||'',p?p.name:'',statusMap[r.approvalStatus]||'معتمدة'];
+  });
+  const ws=XLSX.utils.aoa_to_sheet([hdrs,...data]);
+  ws['!cols']=[{wch:12},{wch:8},{wch:20},{wch:15},{wch:12},{wch:14},{wch:12},{wch:18},{wch:10}];
+  const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'الوقود');
+  XLSX.writeFile(wb,`fuel_export_${today()}.xlsx`);
+  logAct('تصدير Excel وقود',`${rows.length} سجل`);toast(`تم تصدير ${rows.length} سجل`);
+}
+
+/* ============================================================
+   EXCEL EXPORT — MAINTENANCE
+   ============================================================ */
+function exportMaintExcel(){
+  if(!can('maintenance_view')&&!can('reports_export_excel')){toast('ليس لديك صلاحية','error');return;}
+  const rows=_currentMaintRows;
+  if(!rows.length){toast('لا توجد بيانات للتصدير','error');return;}
+  const hdrs=['التاريخ','السيارة','نوع الصيانة','التكلفة (ر.س)','الورشة','المشروع','الصيانة القادمة'];
+  const data=rows.map(r=>{
+    const v=DB.find('vehicles',r.vehicleId),p=DB.find('projects',r.projectId);
+    return[r.date||r.createdAt.slice(0,10),v?v.name:'',r.type||'',parseFloat(r.cost)||0,r.workshop||'',p?p.name:'',r.nextDate||''];
+  });
+  const ws=XLSX.utils.aoa_to_sheet([hdrs,...data]);
+  ws['!cols']=[{wch:12},{wch:20},{wch:16},{wch:14},{wch:18},{wch:18},{wch:14}];
+  const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'الصيانة');
+  XLSX.writeFile(wb,`maintenance_export_${today()}.xlsx`);
+  logAct('تصدير Excel صيانة',`${rows.length} سجل`);toast(`تم تصدير ${rows.length} سجل`);
+}
+
+/* ============================================================
+   EXCEL IMPORT — FUEL
+   ============================================================ */
+function importFuelExcel(){
+  if(!can('fuel_add')){toast('ليس لديك صلاحية','error');return;}
+  const inp=document.createElement('input');inp.type='file';inp.accept='.xlsx,.xls';
+  inp.onchange=async e=>{
+    const file=e.target.files[0];if(!file)return;
+    try{
+      const buf=await file.arrayBuffer();
+      const wb=XLSX.read(buf,{type:'array'});
+      const ws=wb.Sheets[wb.SheetNames[0]];
+      const raw=XLSX.utils.sheet_to_json(ws,{header:1,defval:''});
+      if(raw.length<2){toast('الملف فارغ أو لا يحتوي على بيانات','error');return;}
+      const hdrRow=(raw[0]||[]).map(h=>String(h).trim());
+      // Map columns by header name
+      const col=name=>hdrRow.findIndex(h=>h.includes(name));
+      const iDate=col('التاريخ'),iVeh=col('السيارة'),iQty=col('الكمية'),iCost=col('التكلفة'),iTime=col('الوقت'),iOdo=col('العداد'),iPrj=col('المشروع');
+      if(iDate<0||iVeh<0||iQty<0){toast('الملف يجب أن يحتوي على أعمدة: التاريخ، السيارة، الكمية','error');return;}
+      const vehicles=DB.all('vehicles');const projects=DB.all('projects');
+      const existing=DB.all('fuel');
+      let imported=0,skipped=0,errors=[];
+      const toImport=[];
+      for(let i=1;i<raw.length;i++){
+        const row=raw[i];
+        const dateVal=String(row[iDate]||'').trim();
+        const vehName=String(row[iVeh]||'').trim();
+        const qty=parseFloat(String(row[iQty]||'').replace(/[^\d.]/g,''))||0;
+        if(!dateVal||!vehName||qty<=0){skipped++;continue;}
+        const veh=vehicles.find(v=>v.name===vehName||v.plate===vehName);
+        if(!veh){errors.push(`سطر ${i+1}: سيارة غير موجودة "${vehName}"`);skipped++;continue;}
+        const cost=iCost>=0?parseFloat(String(row[iCost]||'').replace(/[^\d.]/g,''))||0:0;
+        const fillTime=iTime>=0?String(row[iTime]||'').trim():'';
+        const odometer=iOdo>=0?parseInt(String(row[iOdo]||'').replace(/[^\d]/g,''))||null:null;
+        const prjName=iPrj>=0?String(row[iPrj]||'').trim():'';
+        const prj=prjName?projects.find(p=>p.name===prjName):null;
+        // Duplicate check: same date + vehicle + quantity
+        const dup=existing.find(r=>(r.date||r.createdAt.slice(0,10))===dateVal&&r.vehicleId===veh.id&&parseFloat(r.quantity)===qty);
+        if(dup){skipped++;continue;}
+        toImport.push({vehicleId:veh.id,date:dateVal,quantity:qty,cost,fillTime:fillTime||null,odometer,projectId:prj?prj.id:null,approvalStatus:'pending',userId:currentUser.id,userName:currentUser.name});
+      }
+      if(!toImport.length&&!errors.length){toast('لا توجد سجلات جديدة للاستيراد (كل السجلات موجودة أو ناقصة)','info');return;}
+      const msg=`تم قراءة الملف:\n• سيُستورَد: ${toImport.length} سجل\n• مكرر/ناقص: ${skipped}\n${errors.length?'• أخطاء:\n'+errors.slice(0,5).join('\n')+(errors.length>5?`\n...و${errors.length-5} أخرى`:''):''}\n\nهل تريد الاستيراد؟`;
+      confirm2(msg,()=>{
+        toImport.forEach(r=>DB.add('fuel',r));
+        logAct('استيراد Excel وقود',`${toImport.length} سجل`);
+        toast(`✅ تم استيراد ${toImport.length} من أصل ${toImport.length+skipped} سجل`);
+        renderFuel();
+      });
+    }catch(err){toast('خطأ في قراءة الملف: '+err.message,'error');}
+  };
+  inp.click();
+}
+
+/* ============================================================
+   EXCEL IMPORT — MAINTENANCE
+   ============================================================ */
+function importMaintExcel(){
+  if(!can('maintenance_add')){toast('ليس لديك صلاحية','error');return;}
+  const inp=document.createElement('input');inp.type='file';inp.accept='.xlsx,.xls';
+  inp.onchange=async e=>{
+    const file=e.target.files[0];if(!file)return;
+    try{
+      const buf=await file.arrayBuffer();
+      const wb=XLSX.read(buf,{type:'array'});
+      const ws=wb.Sheets[wb.SheetNames[0]];
+      const raw=XLSX.utils.sheet_to_json(ws,{header:1,defval:''});
+      if(raw.length<2){toast('الملف فارغ أو لا يحتوي على بيانات','error');return;}
+      const hdrRow=(raw[0]||[]).map(h=>String(h).trim());
+      const col=name=>hdrRow.findIndex(h=>h.includes(name));
+      const iDate=col('التاريخ'),iVeh=col('السيارة'),iType=col('نوع'),iCost=col('التكلفة'),iWork=col('الورشة'),iPrj=col('المشروع'),iNext=col('القادمة');
+      if(iDate<0||iVeh<0||iType<0){toast('الملف يجب أن يحتوي على أعمدة: التاريخ، السيارة، نوع الصيانة','error');return;}
+      const vehicles=DB.all('vehicles');const projects=DB.all('projects');
+      const existing=DB.all('maintenance');
+      let skipped=0;const errors=[];const toImport=[];
+      for(let i=1;i<raw.length;i++){
+        const row=raw[i];
+        const dateVal=String(row[iDate]||'').trim();
+        const vehName=String(row[iVeh]||'').trim();
+        const mType=String(row[iType]||'').trim();
+        if(!dateVal||!vehName||!mType){skipped++;continue;}
+        const veh=vehicles.find(v=>v.name===vehName||v.plate===vehName);
+        if(!veh){errors.push(`سطر ${i+1}: سيارة غير موجودة "${vehName}"`);skipped++;continue;}
+        const cost=iCost>=0?parseFloat(String(row[iCost]||'').replace(/[^\d.]/g,''))||0:0;
+        const workshop=iWork>=0?String(row[iWork]||'').trim():'';
+        const prjName=iPrj>=0?String(row[iPrj]||'').trim():'';
+        const nextDate=iNext>=0?String(row[iNext]||'').trim():'';
+        const prj=prjName?projects.find(p=>p.name===prjName):null;
+        // Duplicate check: same date + vehicle + type
+        const dup=existing.find(r=>(r.date||r.createdAt.slice(0,10))===dateVal&&r.vehicleId===veh.id&&r.type===mType);
+        if(dup){skipped++;continue;}
+        toImport.push({vehicleId:veh.id,date:dateVal,type:mType,cost,workshop:workshop||null,projectId:prj?prj.id:null,nextDate:nextDate||null,userId:currentUser.id,userName:currentUser.name});
+      }
+      if(!toImport.length&&!errors.length){toast('لا توجد سجلات جديدة للاستيراد','info');return;}
+      const msg=`تم قراءة الملف:\n• سيُستورَد: ${toImport.length} سجل\n• مكرر/ناقص: ${skipped}\n${errors.length?'• أخطاء:\n'+errors.slice(0,5).join('\n')+(errors.length>5?`\n...و${errors.length-5} أخرى`:''):''}\n\nهل تريد الاستيراد؟`;
+      confirm2(msg,()=>{
+        toImport.forEach(r=>DB.add('maintenance',r));
+        logAct('استيراد Excel صيانة',`${toImport.length} سجل`);
+        toast(`✅ تم استيراد ${toImport.length} من أصل ${toImport.length+skipped} سجل`);
+        renderMaintenance();
+      });
+    }catch(err){toast('خطأ في قراءة الملف: '+err.message,'error');}
+  };
+  inp.click();
+}
+
+/* ============================================================
+   DOWNLOAD IMPORT TEMPLATE
+   ============================================================ */
+function downloadImportTemplate(type){
+  let hdrs,example,sheetName,fileName;
+  if(type==='fuel'){
+    hdrs=['التاريخ','الوقت','السيارة','الكمية (لتر)','التكلفة (ر.س)','العداد (كم)','المشروع'];
+    example=['2026-01-15','08:30','اسم السيارة هنا','50','150','125000','اسم المشروع (اختياري)'];
+    sheetName='قالب الوقود';fileName='fuel_import_template.xlsx';
+  } else {
+    hdrs=['التاريخ','السيارة','نوع الصيانة','التكلفة (ر.س)','الورشة','المشروع','تاريخ الصيانة القادمة'];
+    example=['2026-01-15','اسم السيارة هنا','تغيير زيت','300','اسم الورشة','اسم المشروع (اختياري)','2026-04-15'];
+    sheetName='قالب الصيانة';fileName=`maintenance_import_template.xlsx`;
+  }
+  const ws=XLSX.utils.aoa_to_sheet([hdrs,example]);
+  ws['!cols']=hdrs.map(()=>({wch:22}));
+  const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,sheetName);
+  XLSX.writeFile(wb,fileName);
+  toast('تم تحميل قالب الاستيراد');
+}
+
+/* ============================================================
+   NOTES
+   ============================================================ */
+function renderNotes(){
+  if(!can('notes_view')){toast('ليس لديك صلاحية','error');navigate('dashboard');return;}
+  const vehicles=DB.all('vehicles').filter(v=>!v.archived);
+  document.getElementById('pageBody').innerHTML=`
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-body">
+        <div class="form-group mb-0"><label>اختر السيارة لعرض ملاحظاتها</label>
+          <select class="form-control" id="nvs" onchange="renderVehNotes()">
+            <option value="">-- اختر سيارة --</option>
+            ${vehicles.map(v=>`<option value="${v.id}">${esc(v.name)}${v.plate?' ('+v.plate+')':''}</option>`).join('')}
+          </select></div>
+      </div>
+    </div>
+    <div id="notesContent"></div>`;
+}
+function renderVehNotes(){
+  const nvs=document.getElementById('nvs');if(!nvs)return;const vehicleId=nvs.value;
+  const c=document.getElementById('notesContent');
+  if(!vehicleId){c.innerHTML='';return;}
+  const v=DB.find('vehicles',vehicleId);
+  const notes=DB.all('notes').filter(n=>n.vehicleId===vehicleId).sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt));
+  c.innerHTML=`
+    <div class="card">
+      <div class="card-header"><span class="card-title">📝 ملاحظات: ${esc(v?.name||'')}</span>
+        ${can('notes_add')?`<button class="btn btn-sm btn-primary" onclick="openNoteModal(null,'${vehicleId}')">+ إضافة</button>`:''}
+      </div>
+      <div class="card-body">
+        ${notes.length===0?`<div class="tbl-empty"><div class="ei">📝</div><p>لا توجد ملاحظات</p></div>`:
+          notes.map(n=>`<div class="note-item">
+            <div class="note-meta">
+              <span class="note-author">👤 ${esc(n.userName||'-')} — ${fmtDateTime(n.createdAt)}</span>
+              <div class="tbl-actions">
+                ${can('notes_edit')?`<button class="btn btn-sm btn-info" onclick="openNoteModal('${n.id}','${vehicleId}')">✏️</button>`:''}
+                ${can('notes_delete')?`<button class="btn btn-sm btn-danger" onclick="confirmDelNote('${n.id}')">🗑️</button>`:''}
+              </div>
+            </div>
+            <div class="note-text">${esc(n.text)}</div>
+          </div>`).join('')}
+      </div>
+    </div>`;
+}
+function openNoteModal(id,vehicleId){
+  const n=id?DB.find('notes',id):null;
+  openModal(id?'تعديل الملاحظة':'إضافة ملاحظة',`
+    <div class="form-group"><label>نص الملاحظة <span class="req">*</span></label>
+      <textarea class="form-control" id="nm_t" rows="5">${n?esc(n.text):''}</textarea></div>`,
+    'حفظ',()=>saveNote(id,vehicleId));
+}
+function saveNote(id,vehicleId){
+  if(id?!can('notes_edit'):!can('notes_add')){toast('ليس لديك صلاحية','error');return;}
+  const text=document.getElementById('nm_t').value.trim();
+  if(!text){toast('اكتب الملاحظة','error');return;}
+  if(id)DB.update('notes',id,{text});
+  else DB.add('notes',{vehicleId,text,userId:currentUser.id,userName:currentUser.name});
+  toast(id?'تم التحديث':'تمت الإضافة');closeModal();renderVehNotes();
+}
+function confirmDelNote(id){
+  confirm2('حذف هذه الملاحظة؟',()=>{DB.del('notes',id);toast('تم الحذف');renderVehNotes();});
+}
+
+/* ============================================================
+   INVOICES
+   ============================================================ */
+function renderInvoices(){
+  if(!can('invoices_view')){toast('ليس لديك صلاحية','error');navigate('dashboard');return;}
+  if(can('invoices_add'))document.getElementById('topActions').innerHTML=`<button class="btn btn-primary" onclick="openInvoiceModal()">+ رفع فاتورة</button>`;
+  const invoices=DB.all('invoices').sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt));
+  const vehicles=DB.all('vehicles').filter(v=>!v.archived),projects=DB.all('projects');
+  const total=invoices.reduce((s,r)=>s+(parseFloat(r.amount)||0),0);
+  document.getElementById('pageBody').innerHTML=`
+    <div class="card">
+      <div class="card-header"><span class="card-title">الفواتير (${invoices.length})</span>
+        <div class="filter-bar">
+          <select class="f-select" id="ivf" onchange="filterInvoices()"><option value="">كل السيارات</option>${vehicles.map(v=>`<option value="${v.id}">${esc(v.name)}</option>`).join('')}</select>
+          <select class="f-select" id="ipf" onchange="filterInvoices()"><option value="">كل المشاريع</option>${projects.map(p=>`<option value="${p.id}">${esc(p.name)}</option>`).join('')}</select>
+          <input class="f-input" type="date" id="idf" onchange="filterInvoices()">
+        </div></div>
+      <div style="padding:9px 18px;background:#f8fafc;border-bottom:1px solid var(--border);font-size:13px">
+        💰 الإجمالي: <strong>${fmtNum(total)} ر.س</strong> — 📋 العدد: <strong>${invoices.length}</strong>
+      </div>
+      <div class="tbl-wrap"><table>
+        <thead><tr><th>#</th><th>رقم الفاتورة</th><th>التاريخ</th><th>السيارة</th><th>المشروع</th><th>المبلغ</th><th>الوصف</th><th>المرفقات</th><th>الإجراءات</th></tr></thead>
+        <tbody id="invTb">${renderInvRows(invoices)}</tbody>
+      </table></div>
+    </div>`;
+}
+function renderInvRows(list){
+  if(!list.length)return`<tr><td colspan="9" class="tbl-empty"><div class="ei">🧾</div><p>لا توجد فواتير</p></td></tr>`;
+  return list.map((r,i)=>{
+    const v=DB.find('vehicles',r.vehicleId),p=DB.find('projects',r.projectId);
+    const attCount=DB.all('attachments').filter(a=>a.entityType==='invoice'&&a.entityId===r.id).length;
+    return`<tr><td>${i+1}</td>
+      <td><span class="code-tag">${esc(r.invoiceNo||'-')}</span></td>
+      <td>${fmtDate(r.date||r.createdAt)}</td>
+      <td>${v?esc(v.name):'-'}</td><td>${p?esc(p.name):'-'}</td>
+      <td><strong>${fmtNum(r.amount)}</strong> ر.س</td>
+      <td style="max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(r.description||'-')}</td>
+      <td>${attCount>0?`<span class="badge b-info">📎 ${attCount}</span>`:'<span class="text-muted">-</span>'}</td>
+      <td class="tbl-actions">
+        <button class="btn btn-sm btn-secondary" onclick="viewInvoiceAtts('${r.id}')">📎</button>
+        ${can('invoices_delete')?`<button class="btn btn-sm btn-danger" onclick="confirmDelInvoice('${r.id}')">🗑️</button>`:''}
+      </td></tr>`;}).join('');
+}
+function filterInvoices(){
+  const vf=document.getElementById('ivf').value,pf=document.getElementById('ipf').value,df=document.getElementById('idf').value;
+  let rows=DB.all('invoices').sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt));
+  if(vf)rows=rows.filter(r=>r.vehicleId===vf);if(pf)rows=rows.filter(r=>r.projectId===pf);
+  if(df)rows=rows.filter(r=>(r.date||r.createdAt.slice(0,10))>=df);
+  document.getElementById('invTb').innerHTML=renderInvRows(rows);
+}
+function openInvoiceModal(id){
+  const r=id?DB.find('invoices',id):null;
+  const vehicles=DB.all('vehicles').filter(v=>!v.archived),projects=DB.all('projects');
+  openModal(id?'تعديل الفاتورة':'رفع فاتورة جديدة',`
+    <div class="form-row">
+      <div class="form-group"><label>رقم الفاتورة</label><input class="form-control" id="ivm_n" value="${r?esc(r.invoiceNo||''):''}"></div>
+      <div class="form-group"><label>التاريخ</label><input class="form-control" type="date" id="ivm_d" value="${r?r.date||today():today()}"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>المبلغ (ر.س)</label><input class="form-control" type="number" id="ivm_a" value="${r?r.amount:''}" min="0" step="0.01"></div>
+      <div class="form-group"><label>السيارة</label>
+        <select class="form-control" id="ivm_v"><option value="">--</option>${vehicles.map(v=>`<option value="${v.id}"${r&&r.vehicleId===v.id?' selected':''}>${esc(v.name)}</option>`).join('')}</select></div>
+    </div>
+    <div class="form-group"><label>المشروع</label>
+      <select class="form-control" id="ivm_p"><option value="">--</option>${projects.map(p=>`<option value="${p.id}"${r&&r.projectId===p.id?' selected':''}>${esc(p.name)}</option>`).join('')}</select></div>
+    <div class="form-group"><label>الوصف</label><textarea class="form-control" id="ivm_desc">${r?esc(r.description||''):''}</textarea></div>
+    <div class="form-group"><label>ملاحظات</label><textarea class="form-control" id="ivm_notes">${r?esc(r.notes||''):''}</textarea></div>`,
+    'حفظ',()=>saveInvoice(id));
+}
+function saveInvoice(id){
+  if(id?!can('invoices_edit'):!can('invoices_add')){toast('ليس لديك صلاحية','error');return;}
+  const data={invoiceNo:document.getElementById('ivm_n').value.trim(),date:document.getElementById('ivm_d').value,
+    amount:parseFloat(document.getElementById('ivm_a').value)||0,vehicleId:document.getElementById('ivm_v').value||null,
+    projectId:document.getElementById('ivm_p').value||null,description:document.getElementById('ivm_desc').value.trim(),
+    notes:document.getElementById('ivm_notes').value.trim(),userId:currentUser.id,userName:currentUser.name};
+  let savedId=id;
+  if(id){DB.update('invoices',id,data);logAct('تعديل فاتورة',data.invoiceNo||'');}
+  else{const rec=DB.add('invoices',data);savedId=rec.id;logAct('رفع فاتورة',data.invoiceNo||'');}
+  toast(id?'تم التحديث':'تمت الإضافة');closeModal();
+  // Offer attachment upload
+  if(!id){
+    setTimeout(()=>{
+      if(confirm('هل تريد إرفاق ملف للفاتورة؟')){
+        uploadAttachment('invoice',savedId,()=>renderInvoices());
+      } else renderInvoices();
+    },300);
+  } else renderInvoices();
+}
+function viewInvoiceAtts(id){
+  const r=DB.find('invoices',id);
+  openModal(`مرفقات فاتورة: ${r?.invoiceNo||''}`,
+    renderAttachments('invoice',id,can('invoices_add'),can('invoices_delete')),
+    null,null);
+}
+function confirmDelInvoice(id){
+  confirm2('حذف هذه الفاتورة؟',()=>{
+    DB.del('invoices',id);
+    DB.set('attachments',DB.all('attachments').filter(a=>!(a.entityType==='invoice'&&a.entityId===id)));
+    logAct('حذف فاتورة','');toast('تم الحذف');renderInvoices();
+  });
+}
+
+/* ============================================================
+   REPORTS
+   ============================================================ */
+function renderReports(){
+  if(!can('reports_view')){toast('ليس لديك صلاحية','error');navigate('dashboard');return;}
+  const vehicles=DB.all('vehicles').filter(v=>!v.archived);
+  const projects=DB.all('projects');
+  const groups=DB.all('groups');
+  document.getElementById('pageBody').innerHTML=`
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-body" style="padding:12px 16px">
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--border)">
+          <span style="font-weight:700;color:var(--text-light);font-size:12px;width:100%;margin-bottom:2px">🔍 فلاتر التقرير:</span>
+          <input class="f-input" type="date" id="rpt_df" placeholder="من تاريخ" title="من تاريخ">
+          <input class="f-input" type="date" id="rpt_tf" placeholder="إلى تاريخ" title="إلى تاريخ">
+          <select class="f-select" id="rpt_vf">
+            <option value="">كل السيارات</option>
+            ${vehicles.map(v=>`<option value="${v.id}">${esc(v.name)}</option>`).join('')}
+          </select>
+          <select class="f-select" id="rpt_pf">
+            <option value="">كل المشاريع</option>
+            ${projects.map(p=>`<option value="${p.id}">${esc(p.name)}</option>`).join('')}
+          </select>
+          <select class="f-select" id="rpt_gf">
+            <option value="">كل المجموعات</option>
+            ${groups.map(g=>`<option value="${g.id}">${esc(g.name)}</option>`).join('')}
+          </select>
+          <button class="btn btn-sm btn-secondary" onclick="document.getElementById('rpt_df').value='';document.getElementById('rpt_tf').value='';document.getElementById('rpt_vf').value='';document.getElementById('rpt_pf').value='';document.getElementById('rpt_gf').value='';if(_lastReportType)showReport(_lastReportType)">✕ مسح</button>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+          <span style="font-weight:700;color:var(--text-light);font-size:13px">نوع التقرير:</span>
+          <button class="btn btn-sm btn-info" onclick="showReport('fuelVeh')">⛽ الوقود بالسيارة</button>
+          <button class="btn btn-sm btn-info" onclick="showReport('fuelPrj')">🏗️ الوقود بالمشروع</button>
+          <button class="btn btn-sm btn-warning" onclick="showReport('maintRep')">🔧 الصيانة</button>
+          <button class="btn btn-sm btn-purple" onclick="showReport('monthly')">📅 المصروفات الشهرية</button>
+          <button class="btn btn-sm btn-dark" onclick="showReport('usersRep')">👥 المستخدمون</button>
+        </div>
+      </div>
+    </div>
+    <div id="reportArea" style="min-height:200px">
+      <div style="text-align:center;padding:60px 20px;color:var(--text-light)">
+        <div style="font-size:48px;margin-bottom:12px">📊</div>
+        <p style="font-size:15px">اختر نوع التقرير من الأعلى</p>
+      </div>
+    </div>`;
+}
+let _lastReportType='';
+
+function showReport(type){
+  const area=document.getElementById('reportArea');
+  if(!area && !_captureReport)return;
+  _lastReportType=type;
+
+  // Read filter values
+  const df=document.getElementById('rpt_df')?.value||'';
+  const tf=document.getElementById('rpt_tf')?.value||'';
+  const vf=document.getElementById('rpt_vf')?.value||'';
+  const pf=document.getElementById('rpt_pf')?.value||'';
+  const gf=document.getElementById('rpt_gf')?.value||'';
+
+  // Group vehicles for group filter
+  const gVeh=gf?DB.all('vehicles').filter(v=>v.groupId===gf).map(v=>v.id):null;
+
+  // Base datasets with approval filter
+  let fuel=DB.all('fuel').filter(r=>r.approvalStatus==='approved'||!r.approvalStatus);
+  let maint=DB.all('maintenance');
+  const vehicles=DB.all('vehicles'),projects=DB.all('projects'),users=DB.all('users');
+
+  // Apply common filters to fuel
+  if(df) fuel=fuel.filter(r=>(r.date||r.createdAt.slice(0,10))>=df);
+  if(tf) fuel=fuel.filter(r=>(r.date||r.createdAt.slice(0,10))<=tf);
+  if(vf) fuel=fuel.filter(r=>r.vehicleId===vf);
+  if(pf) fuel=fuel.filter(r=>r.projectId===pf);
+  if(gVeh) fuel=fuel.filter(r=>gVeh.includes(r.vehicleId));
+
+  // Apply common filters to maint
+  if(df) maint=maint.filter(r=>(r.date||r.createdAt.slice(0,10))>=df);
+  if(tf) maint=maint.filter(r=>(r.date||r.createdAt.slice(0,10))<=tf);
+  if(vf) maint=maint.filter(r=>r.vehicleId===vf);
+  if(pf) maint=maint.filter(r=>r.projectId===pf);
+  if(gVeh) maint=maint.filter(r=>gVeh.includes(r.vehicleId));
+
+  if(type==='fuelVeh'){
+    const byVeh={};
+    fuel.forEach(r=>{
+      const k=r.vehicleId||'_none_';
+      if(!byVeh[k])byVeh[k]={liters:0,cost:0,count:0};
+      byVeh[k].liters+=(parseFloat(r.quantity)||0);
+      byVeh[k].cost+=(parseFloat(r.cost)||0);
+      byVeh[k].count++;
+    });
+    const rows=Object.entries(byVeh).sort((a,b)=>b[1].cost-a[1].cost).map(([vid,d])=>{
+      const v=DB.find('vehicles',vid);const g=v?DB.find('groups',v.groupId):null;const p=v?DB.find('projects',v.projectId):null;
+      return[v?v.name:'غير محدد',g?g.name:'-',p?p.name:'-',v?v.fuelType:'-',fmtNum(d.liters)+' لتر',fmtNum(d.cost)+' ر.س',d.count];
+    });
+    const tL=fuel.reduce((s,r)=>s+(parseFloat(r.quantity)||0),0),tC=fuel.reduce((s,r)=>s+(parseFloat(r.cost)||0),0);
+    const hdrs=['السيارة','المجموعة','المشروع','الوقود','الكمية','التكلفة','العمليات'];
+    {const _rh=buildReportCard('⛽ تقرير الوقود بالسيارة',hdrs,rows,
+      [{label:'إجمالي الكمية',val:fmtNum(tL)+' لتر'},{label:'إجمالي التكلفة',val:fmtNum(tC)+' ر.س'}],
+      type,hdrs,rows);if(area)area.innerHTML=_rh;}
+  }
+  else if(type==='fuelPrj'){
+    const byPrj={};
+    fuel.forEach(r=>{const k=r.projectId||'_none_';if(!byPrj[k])byPrj[k]={liters:0,cost:0,vids:new Set()};byPrj[k].liters+=(parseFloat(r.quantity)||0);byPrj[k].cost+=(parseFloat(r.cost)||0);byPrj[k].vids.add(r.vehicleId);});
+    const rows=Object.entries(byPrj).sort((a,b)=>b[1].cost-a[1].cost).map(([pid,d])=>{
+      const p=DB.find('projects',pid);
+      return[p?p.name:'بدون مشروع',fmtNum(d.liters)+' لتر',fmtNum(d.cost)+' ر.س',d.vids.size];
+    });
+    const hdrs=['المشروع','الكمية','التكلفة','عدد السيارات'];
+    {const _rh=buildReportCard('🏗️ تقرير الوقود بالمشروع',hdrs,rows,[],type,hdrs,rows);if(area)area.innerHTML=_rh;}
+  }
+  else if(type==='maintRep'){
+    const rows=maint.slice().sort((a,b)=>new Date(b.date||b.createdAt)-new Date(a.date||a.createdAt)).map(m=>{
+      const v=DB.find('vehicles',m.vehicleId),p=DB.find('projects',m.projectId);
+      return[v?v.name:'-',m.type||'-',p?p.name:'-',fmtDate(m.date||m.createdAt),fmtNum(m.cost)+' ر.س',m.workshop||'-'];
+    });
+    const tC=maint.reduce((s,m)=>s+(parseFloat(m.cost)||0),0);
+    const hdrs=['السيارة','النوع','المشروع','التاريخ','التكلفة','الورشة'];
+    {const _rh=buildReportCard('🔧 تقرير الصيانة',hdrs,rows,[{label:'إجمالي التكاليف',val:fmtNum(tC)+' ر.س'}],type,hdrs,rows);if(area)area.innerHTML=_rh;}
+  }
+  else if(type==='monthly'){
+    // For monthly: apply date & group filters; vehicle/project filters already applied above
+    const months={};
+    fuel.forEach(r=>{const m=(r.date||r.createdAt).slice(0,7);if(!months[m])months[m]={fuel:0,maint:0};months[m].fuel+=(parseFloat(r.cost)||0);});
+    maint.forEach(r=>{const m=(r.date||r.createdAt).slice(0,7);if(!months[m])months[m]={fuel:0,maint:0};months[m].maint+=(parseFloat(r.cost)||0);});
+    const rows=Object.entries(months).sort((a,b)=>b[0].localeCompare(a[0])).map(([m,d])=>{
+      const total=d.fuel+d.maint;
+      const dt=new Date(m+'-01');const label=dt.toLocaleDateString('ar-SA',{year:'numeric',month:'long'});
+      return[label,fmtNum(d.fuel)+' ر.س',fmtNum(d.maint)+' ر.س',fmtNum(total)+' ر.س'];
+    });
+    const tF=fuel.reduce((s,r)=>s+(parseFloat(r.cost)||0),0),tM=maint.reduce((s,r)=>s+(parseFloat(r.cost)||0),0);
+    const hdrs=['الشهر','تكلفة الوقود','تكلفة الصيانة','الإجمالي'];
+    {const _rh=buildReportCard('📅 تقرير المصروفات الشهرية',hdrs,rows,
+      [{label:'وقود',val:fmtNum(tF)+' ر.س'},{label:'صيانة',val:fmtNum(tM)+' ر.س'},{label:'الإجمالي',val:fmtNum(tF+tM)+' ر.س'}],type,hdrs,rows);if(area)area.innerHTML=_rh;}
+  }
+  else if(type==='usersRep'){
+    const rows=users.map((u,i)=>{
+      const uFuel=fuel.filter(f=>f.userId===u.id).length;
+      const uMaint=maint.filter(m=>m.userId===u.id).length;
+      const roleMap={owner:'مالك',admin:'مدير',user:'مستخدم'};
+      return[i+1,u.name,u.username,roleMap[u.role]||u.role,uFuel,uMaint];
+    });
+    const hdrs=['#','الاسم','المستخدم','الصلاحية','عمليات وقود','عمليات صيانة'];
+    {const _rh=buildReportCard('👥 تقرير المستخدمين',hdrs,rows,[],type,hdrs,rows);if(area)area.innerHTML=_rh;}
+  }
+}
+
+let _lastReport={type:'',hdrs:[],rows:[]};
+function doExportCSV(type){
+  _captureReport=true;
+  showReport(type);_captureReport=false;
+  if(!_lastReport.rows.length){toast('لا توجد بيانات للتصدير','error');return;}
+  const ws=XLSX.utils.aoa_to_sheet([_lastReport.hdrs,..._lastReport.rows]);
+  const wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,ws,'تقرير');
+  XLSX.writeFile(wb,`report_${type}_${today()}.xlsx`);
+  logAct('تصدير Excel',type);toast('تم تصدير الملف');
+}
+let _captureReport=false;
+
+function doPrint(type){
+  _captureReport=true;showReport(type);_captureReport=false;
+  if(!_lastReport.hdrs.length)return;
+  const w=window.open('','_blank');
+  if(!w){toast('لم يمكن فتح نافذة الطباعة','error');return;}
+  const tbl=`<table border="1" style="border-collapse:collapse;width:100%;font-size:13px">
+    <thead style="background:#eee"><tr>${_lastReport.hdrs.map(h=>`<th style="padding:8px">${h}</th>`).join('')}</tr></thead>
+    <tbody>${_lastReport.rows.map(r=>`<tr>${r.map(c=>`<td style="padding:7px">${c}</td>`).join('')}</tr>`).join('')}</tbody>
+  </table>`;
+  w.document.write(`<!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8"><title>تقرير</title>
+    <style>body{font-family:Arial,sans-serif;direction:rtl;padding:20px}h2{text-align:center}@media print{.np{display:none}}</style>
+  </head><body><h2>${PAGE_TITLES[currentPage]||'تقرير'}</h2>
+    <p style="color:#888;font-size:12px">تاريخ الطباعة: ${new Date().toLocaleDateString('ar-SA')} — ${esc(currentUser?.name||'')}</p>
+    ${tbl}<br><button class="np" onclick="window.print()">🖨️ طباعة</button></body></html>`);
+  w.document.close();logAct('تصدير PDF',type);
+}
+
+function buildReportCard(title,hdrs,rows,summaries,type,exportHdrs,exportRows){
+  if(_captureReport){_lastReport={type,hdrs:exportHdrs||hdrs,rows:exportRows||rows};return'';}
+  const canExcelExp=can('reports_export_excel');const canPrintExp=can('reports_export_pdf');
+  const sumHtml=summaries.length?`<div style="display:flex;gap:20px;padding:10px 16px;background:#f8fafc;border-bottom:1px solid var(--border);font-size:13px;flex-wrap:wrap">
+    ${summaries.map(s=>`<span>${s.label}: <strong>${s.val}</strong></span>`).join('')}
+  </div>`:'';
+  return`<div class="card">
+    <div class="card-header"><span class="card-title">${title}</span>
+      <div class="d-flex gap-2">
+        ${canExcelExp?`<button class="btn btn-sm btn-success" onclick="doExportCSV('${type}')">📥 Excel</button>`:''}
+        ${canPrintExp?`<button class="btn btn-sm btn-info" onclick="doPrint('${type}')">🖨️ طباعة</button>`:''}
+      </div></div>
+    ${sumHtml}
+    <div class="tbl-wrap"><table>
+      <thead><tr>${hdrs.map(h=>`<th>${h}</th>`).join('')}</tr></thead>
+      <tbody>${rows.length===0?`<tr><td colspan="${hdrs.length}" class="tbl-empty"><p>لا توجد بيانات</p></td></tr>`:
+        rows.map(r=>`<tr>${r.map(c=>`<td>${esc(String(c))}</td>`).join('')}</tr>`).join('')}
+      </tbody>
+    </table></div>
+  </div>`;
+}
+
+/* ============================================================
+   USERS + PERMISSIONS UI
+   ============================================================ */
+function renderPermForm(userPerms,isOwnerUser){
+  if(isOwnerUser)return`<div style="background:#fef3e7;border-radius:8px;padding:14px;font-size:13px;color:var(--accent);border:1px solid rgba(230,126,34,.3)">
+    👑 المالك الرئيسي يمتلك جميع الصلاحيات تلقائياً — لا يمكن تعديل صلاحياته.
+  </div>`;
+  return`<div class="perm-grid">${PERM_SECTIONS.map(s=>`
+    <div class="perm-section">
+      <div class="perm-sec-head">
+        <span>${s.icon}</span><strong>${s.label}</strong>
+        <button type="button" class="perm-toggle" onclick="togglePS('${s.id}',true)">الكل</button>
+        <button type="button" class="perm-toggle" onclick="togglePS('${s.id}',false)">لا شيء</button>
+      </div>
+      <div class="perm-checks">${s.perms.map(p=>`
+        <label class="perm-cb">
+          <input type="checkbox" name="pc_${p.key}" data-sec="${s.id}" ${(userPerms||{})[p.key]?'checked':''}>
+          ${p.label}
+        </label>`).join('')}
+      </div>
+    </div>`).join('')}</div>`;
+}
+function togglePS(secId,checked){
+  document.querySelectorAll(`input[data-sec="${secId}"]`).forEach(cb=>cb.checked=checked);
+}
+function collectPerms(){
+  const perms={};
+  document.querySelectorAll('.perm-cb input[type=checkbox]').forEach(cb=>{perms[cb.name.replace('pc_','')]=cb.checked;});
+  return perms;
+}
+function toggleAllPerms(checked){
+  document.querySelectorAll('.perm-cb input[type=checkbox]').forEach(cb=>cb.checked=checked);
+}
+
+function renderUsers(){
+  if(!can('users_view')){toast('ليس لديك صلاحية','error');navigate('dashboard');return;}
+  if(can('users_add'))document.getElementById('topActions').innerHTML=`<button class="btn btn-primary" onclick="openUserModal()">+ إضافة مستخدم</button>`;
+  const users=DB.all('users');
+  document.getElementById('pageBody').innerHTML=`
+    <div class="card">
+      <div class="card-header"><span class="card-title">المستخدمون (${users.length})</span></div>
+      <div class="tbl-wrap"><table>
+        <thead><tr><th>#</th><th>الاسم</th><th>اسم المستخدم</th><th>الصلاحية</th><th>الصلاحيات الممنوحة</th><th>الإجراءات</th></tr></thead>
+        <tbody>
+          ${users.map((u,i)=>{
+            const roleMap={owner:'المالك 👑',admin:'مدير',user:'مستخدم'};
+            const rCls={owner:'role-owner',admin:'role-admin',user:'role-user'};
+            const permCount=u.role==='owner'?'جميع الصلاحيات':Object.values(u.permissions||{}).filter(Boolean).length+' صلاحية';
+            const isSelf=u.id===currentUser.id;const isOwnerUser=u.role==='owner';
+            return`<tr>
+              <td>${i+1}</td>
+              <td><strong>${esc(u.name)}</strong></td>
+              <td><span class="code-tag">${esc(u.username)}</span></td>
+              <td><span class="role-chip ${rCls[u.role]||'role-user'}">${roleMap[u.role]||u.role}</span></td>
+              <td><span class="badge b-info">${permCount}</span></td>
+              <td class="tbl-actions">
+                ${can('users_edit')?`<button class="btn btn-sm btn-info" onclick="openUserModal('${u.id}')">✏️ تعديل</button>`:''}
+                ${can('users_delete')&&!isSelf&&!isOwnerUser?`<button class="btn btn-sm btn-danger" onclick="confirmDelUser('${u.id}')">🗑️</button>`:''}
+                ${isSelf?'<span class="text-muted" style="font-size:12px">حسابك</span>':''}
+                ${isOwnerUser&&!isSelf?'<span class="text-muted" style="font-size:12px">محمي</span>':''}
+              </td></tr>`;}).join('')}
+        </tbody>
+      </table></div>
+    </div>`;
+}
+
+function openUserModal(id){
+  const u=id?DB.find('users',id):null;
+  const isOwnerUser=u?.role==='owner';
+  openModal(id?'تعديل المستخدم':'إضافة مستخدم جديد',`
+    <div class="form-row">
+      <div class="form-group"><label>الاسم الكامل <span class="req">*</span></label><input class="form-control" id="um_n" value="${u?esc(u.name):''}"></div>
+      <div class="form-group"><label>اسم المستخدم <span class="req">*</span></label><input class="form-control" id="um_u" value="${u?esc(u.username):''}" ${isOwnerUser?'readonly':''}></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>كلمة المرور ${id?'(فارغ = بدون تغيير)':''}<span class="req">${!id?'*':''}</span></label>
+        <input class="form-control" type="password" id="um_p" autocomplete="new-password" placeholder="${id?'اتركها فارغة للإبقاء على الحالية':'كلمة المرور'}"></div>
+      <div class="form-group"><label>الدور</label>
+        <select class="form-control" id="um_r" ${isOwnerUser?'disabled':''}>
+          <option value="user" ${u&&u.role==='user'?'selected':''}>👤 مستخدم</option>
+          <option value="admin" ${u&&u.role==='admin'?'selected':''}>👨‍💼 مدير</option>
+          ${isOwnerUser?`<option value="owner" selected>👑 مالك</option>`:''}
+        </select></div>
+    </div>
+    <hr class="form-divider">
+    <div class="d-flex align-center gap-2" style="margin-bottom:12px">
+      <span class="form-section-title" style="margin-bottom:0">الصلاحيات</span>
+      ${!isOwnerUser?`<button type="button" class="btn btn-sm btn-secondary" onclick="toggleAllPerms(true)">تحديد الكل</button>
+        <button type="button" class="btn btn-sm btn-secondary" onclick="toggleAllPerms(false)">إلغاء الكل</button>`:''}
+    </div>
+    ${renderPermForm(u?.permissions,isOwnerUser)}`,
+    'حفظ',()=>saveUser(id),{wide:true});
+}
+
+async function saveUser(id){
+  const name=document.getElementById('um_n').value.trim();
+  const username=document.getElementById('um_u').value.trim();
+  const password=document.getElementById('um_p').value;
+  if(password&&password.length<6){toast('كلمة المرور 6 أحرف على الأقل','error');return;}
+  const role=document.getElementById('um_r').value;
+  if(!name){toast('أدخل الاسم','error');return;}
+  if(!username){toast('أدخل اسم المستخدم','error');return;}
+  if(!id&&!password){toast('أدخل كلمة المرور','error');return;}
+  const dup=DB.all('users').find(u=>u.username.toLowerCase()===username.toLowerCase()&&u.id!==id);
+  if(dup){toast('اسم المستخدم مستخدم بالفعل','error');return;}
+  const u=id?DB.find('users',id):null;
+  const isOwnerUser=u?.role==='owner';
+  const data={name,username,role:isOwnerUser?'owner':role};
+  if(password){
+    try{data.password=await hashPwd(password);}
+    catch{toast('خطأ في تشفير كلمة المرور — تأكد من استخدام HTTPS','error');return;}
+  }
+  if(!isOwnerUser)data.permissions=collectPerms();
+  if(id){
+    DB.update('users',id,data);
+    logAct('تعديل مستخدم',name+(data.permissions?'+ تعديل صلاحيات':''));
+    // Refresh session if editing self
+    if(id===currentUser.id){currentUser={...currentUser,...data};sessionStorage.setItem('fm2_sess',JSON.stringify({id:currentUser.id}));}
+    toast('تم التحديث');
+  } else {
+    DB.add('users',data);
+    logAct('إضافة مستخدم',name);
+    toast('تمت إضافة المستخدم');
+  }
+  closeModal();renderUsers();
+}
+
+function confirmDelUser(id){
+  const u=DB.find('users',id);
+  if(u?.role==='owner'){toast('لا يمكن حذف المالك الرئيسي','error');return;}
+  if(id===currentUser.id){toast('لا يمكن حذف حسابك الحالي','error');return;}
+  confirm2(`حذف المستخدم "${u?.name}"؟`,()=>{
+    DB.del('users',id);
+    DB.set('fuel',DB.all('fuel').map(r=>r.userId===id?{...r,userId:null,userName:'محذوف'}:r));
+    DB.set('maintenance',DB.all('maintenance').map(r=>r.userId===id?{...r,userId:null,userName:'محذوف'}:r));
+    logAct('حذف مستخدم',u?.name||'');toast('تم الحذف');renderUsers();
+  });
+}
+
+/* ============================================================
+   ACTIVITY LOG
+   ============================================================ */
+function renderActivity(){
+  if(!can('activity_view')&&!isOwner()){toast('ليس لديك صلاحية','error');navigate('dashboard');return;}
+  const logs=DB.all('activity').sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt));
+  const users=[...new Set(logs.map(l=>l.userName).filter(Boolean))];
+  document.getElementById('topActions').innerHTML=
+    `<button class="btn btn-sm btn-danger" onclick="confirmClearActivity()">🗑️ مسح السجل</button>`;
+  document.getElementById('pageBody').innerHTML=`
+    <div class="card">
+      <div class="card-header"><span class="card-title">سجل النشاط (${logs.length} عملية)</span>
+        <div class="filter-bar">
+          <select class="f-select" id="alf" onchange="filterActivity()"><option value="">كل المستخدمين</option>${users.map(u=>`<option value="${u}">${esc(u)}</option>`).join('')}</select>
+          <input class="f-input" type="search" id="als" placeholder="🔍 بحث بالعملية..." oninput="filterActivity()" onsearch="filterActivity()">
+          <input class="f-input" type="date" id="ald" onchange="filterActivity()">
+        </div></div>
+      <div class="tbl-wrap"><table>
+        <thead><tr><th>#</th><th>المستخدم</th><th>العملية</th><th>التفاصيل</th><th>التاريخ والوقت</th></tr></thead>
+        <tbody id="actTb">${renderActRows(logs)}</tbody>
+      </table></div>
+    </div>`;
+}
+function renderActRows(list){
+  if(!list.length)return`<tr><td colspan="5" class="tbl-empty"><div class="ei">📋</div><p>لا توجد سجلات</p></td></tr>`;
+  return list.map((l,i)=>`<tr>
+    <td>${i+1}</td>
+    <td><span class="badge b-info">${esc(l.userName||'-')}</span></td>
+    <td><strong>${esc(l.action||'-')}</strong></td>
+    <td class="text-muted" style="font-size:12px;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(l.details||'-')}</td>
+    <td style="white-space:nowrap;font-size:12px">${fmtDateTime(l.createdAt)}</td>
+  </tr>`).join('');
+}
+function filterActivity(){
+  const uf=document.getElementById('alf').value;
+  const sf=(document.getElementById('als').value||'').toLowerCase();
+  const df=document.getElementById('ald').value;
+  let rows=DB.all('activity').sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt));
+  if(uf)rows=rows.filter(r=>r.userName===uf);
+  if(sf)rows=rows.filter(r=>(r.action||'').toLowerCase().includes(sf)||(r.details||'').toLowerCase().includes(sf));
+  if(df)rows=rows.filter(r=>r.createdAt.slice(0,10)===df);
+  document.getElementById('actTb').innerHTML=renderActRows(rows);
+}
+function confirmClearActivity(){
+  if(!isOwner()){toast('ليس لديك صلاحية','error');return;}
+  confirm2('مسح جميع سجلات النشاط؟ لا يمكن التراجع.',()=>{
+    DB.set('activity',[]);logAct('مسح سجل النشاط','');toast('تم مسح السجل');renderActivity();
+  });
+}
+
+/* ============================================================
+   BACKUP
+   ============================================================ */
+function renderBackup(){
+  if(!isOwner()&&!can('backup_create')){toast('هذه الصفحة للمالك الرئيسي فقط','error');navigate('dashboard');return;}
+  const tables=['users','groups','projects','vehicles','tanks','tankFills','fuel','maintenance','notes','invoices','attachments','activity','drivers','fuelMovements'];
+  const counts=tables.map(t=>({t,c:DB.all(t).length}));
+  const totalRecs=counts.reduce((s,x)=>s+x.c,0);
+  document.getElementById('pageBody').innerHTML=`
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-header"><span class="card-title">💾 إنشاء نسخة احتياطية</span></div>
+        <div class="card-body">
+          <p style="font-size:13px;color:var(--text-light);margin-bottom:16px">
+            تنزيل نسخة احتياطية كاملة من جميع بيانات النظام بصيغة JSON.
+          </p>
+          <div style="background:#f8fafc;border-radius:8px;padding:12px;margin-bottom:16px">
+            <div style="font-size:13px;font-weight:700;margin-bottom:8px">📊 ملخص البيانات الحالية:</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+              ${counts.map(x=>`<div style="font-size:12px;color:var(--text-light)">${x.t}: <strong>${x.c}</strong></div>`).join('')}
+            </div>
+            <div style="margin-top:8px;font-size:13px;font-weight:700;color:var(--accent)">الإجمالي: ${totalRecs} سجل</div>
+          </div>
+          <button class="btn btn-primary btn-full" onclick="createBackup()">⬇️ تنزيل النسخة الاحتياطية</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-title">📂 استعادة نسخة احتياطية</span></div>
+        <div class="card-body">
+          <div style="background:#fdedec;border-radius:8px;padding:12px;margin-bottom:16px;font-size:13px;color:var(--danger)">
+            ⚠️ <strong>تحذير:</strong> سيتم استبدال جميع البيانات الحالية بالبيانات الموجودة في الملف. هذا الإجراء لا يمكن التراجع عنه.
+          </div>
+          <div class="upload-area" onclick="document.getElementById('bkFile').click()">
+            📁 اضغط لاختيار ملف النسخة الاحتياطية (.json)
+          </div>
+          <input type="file" id="bkFile" accept=".json" style="display:none" onchange="restoreBackup(event)">
+          <div id="bkInfo" style="margin-top:10px;font-size:13px;color:var(--text-light)"></div>
+        </div>
+      </div>
+    </div>`;
+}
+
+function createBackup(){
+  const tables=['users','groups','projects','vehicles','tanks','tankFills','fuel','maintenance','notes','invoices','attachments','activity','drivers','fuelMovements'];
+  const backup={version:2,date:new Date().toISOString(),createdBy:currentUser.name,data:{}};
+  tables.forEach(t=>backup.data[t]=DB.all(t));
+  backup.settings=DB.cfg.get('settings')||{};
+  const blob=new Blob([JSON.stringify(backup,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);const a=document.createElement('a');
+  a.href=url;a.download=`fuel_backup_${today()}.json`;document.body.appendChild(a);a.click();document.body.removeChild(a);setTimeout(()=>URL.revokeObjectURL(url),100);
+  logAct('إنشاء نسخة احتياطية',today());toast('✅ تم تنزيل النسخة الاحتياطية بنجاح');
+}
+
+function restoreBackup(e){
+  const file=e.target.files[0];if(!file)return;
+  document.getElementById('bkInfo').textContent='جارٍ قراءة الملف...';
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    try{
+      const bk=JSON.parse(ev.target.result);
+      if(!bk.data)throw new Error('ملف غير صحيح');
+      const totalRecs=Object.values(bk.data).reduce((s,a)=>s+(Array.isArray(a)?a.length:0),0);
+      document.getElementById('bkInfo').innerHTML=`✅ الملف صحيح — ${totalRecs} سجل — بتاريخ ${fmtDate(bk.date)} — بواسطة: ${esc(bk.createdBy||'-')}`;
+      confirm2(`استعادة نسخة بتاريخ ${fmtDate(bk.date)} (${totalRecs} سجل)؟ سيتم استبدال جميع البيانات الحالية.`,()=>{
+        logAct('استعادة نسخة احتياطية',bk.date||'');
+        const ALLOWED=['users','groups','projects','vehicles','tanks','tankFills',
+          'fuel','maintenance','notes','invoices','attachments','activity','drivers','fuelMovements'];
+        ALLOWED.forEach(t=>{if(Array.isArray(bk.data[t]))DB.set(t,bk.data[t]);});
+        if(bk.settings)DB.cfg.set('settings',bk.settings);
+        toast('✅ تمت الاستعادة — سيتم تسجيل الخروج...');
+        document.getElementById('bkFile').value='';
+        setTimeout(()=>logout(),2500);
+      });
+    }catch(err){
+      document.getElementById('bkInfo').innerHTML=`<span style="color:var(--danger)">❌ ملف غير صحيح أو تالف</span>`;
+      toast('ملف النسخة غير صحيح','error');
+    }
+  };
+  reader.onerror=()=>toast('فشل قراءة ملف النسخة الاحتياطية','error');
+  reader.readAsText(file);
+}
+
+/* ============================================================
+   LOGIN HANDLER
+   ============================================================ */
+async function handleLogin(e){
+  e.preventDefault();
+  const btn=document.getElementById('loginBtn');
+  const errEl=document.getElementById('loginError');
+  btn.disabled=true;btn.textContent='جارٍ التحقق...';
+  try{
+    const ok=await doLogin(
+      document.getElementById('li_user').value.trim(),
+      document.getElementById('li_pass').value
+    );
+    if(ok){errEl.style.display='none';showApp();}
+    else{errEl.textContent='اسم المستخدم أو كلمة المرور غير صحيحة';errEl.style.display='block';}
+  }catch{
+    errEl.textContent='حدث خطأ غير متوقع — تأكد من استخدام HTTPS';errEl.style.display='block';
+  }finally{
+    btn.disabled=false;btn.textContent='دخول';
+  }
+}
+
+/* ============================================================
+   BOOTSTRAP
+   ============================================================ */
+document.addEventListener('keydown',e=>{
+  if(e.key!=='Escape')return;
+  if(document.getElementById('confirmOverlay').style.display==='flex')closeConfirm();
+  else if(document.getElementById('modalOverlay').style.display==='flex'&&!_modalSaving)closeModal();
+});
+(async()=>{
+  try{await initApp();}catch(e){console.warn('initApp:',e);}
+  try{
+    if(checkSession())showApp();
+    else showLogin();
+  }catch(err){
+    console.error('bootstrap:',err);
+    showLogin();
+  }
+})();
+</script>
+</body>
+</html>
